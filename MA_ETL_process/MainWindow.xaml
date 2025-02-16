@@ -16,7 +16,8 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1" Margin="0 0 0 0"
+        <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1"
+                 Margin="0 0 0 0" Padding="4 2"
                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                  ScrollViewer.HorizontalScrollBarVisibility="Visible"
                  TextWrapping="NoWrap" IsReadOnly="True"
