@@ -7,8 +7,14 @@
     <Application.Resources>
         <!-- general definition of formatting values -->
         <System:Double x:Key="fontSize">16</System:Double>
+        <Thickness x:Key="margin" Left="5" Top="5" Right="5" Bottom="5"/>
 
         <!-- apply formatting values to control-styles -->
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="{StaticResource fontSize}"/>
+            <Setter Property="Margin" Value="{StaticResource margin}"/>
+            <Setter Property="Padding" Value="10 2"/>
+        </Style>
 
     </Application.Resources>
 </Application>

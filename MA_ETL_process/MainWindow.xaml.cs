@@ -22,5 +22,9 @@ namespace MA_ETL_process
             Utilities.SetTxtConsoleReference = mainWindow.txtConsole;
             Utilities.ConsoleLog("Click a button");
         }
+
+        private void btn_SqlConnection_Click(object sender, RoutedEventArgs e)
+        {
+        }
     }
 }
