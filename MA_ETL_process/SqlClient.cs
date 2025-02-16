@@ -13,8 +13,7 @@ namespace MA_ETL_process
 
         public SqlClient()
         {
-            _connection = new SqlC.SqlConnection(
-                );
+            _connection = new SqlC.SqlConnection(LoginCredentials.SqlConnectionString);
             _connection.Open();
             Utilities.ConsoleLog("Connection to SQL Server successfully");
             // ToDo: was it realy successful?
