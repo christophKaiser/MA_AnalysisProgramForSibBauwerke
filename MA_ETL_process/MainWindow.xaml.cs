@@ -19,6 +19,8 @@ namespace MA_ETL_process
         public MainWindow()
         {
             InitializeComponent();
+            Utilities.SetTxtConsoleReference = mainWindow.txtConsole;
+            Utilities.ConsoleLog("Click a button");
         }
     }
 }
