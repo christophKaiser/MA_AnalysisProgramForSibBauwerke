@@ -41,8 +41,9 @@ namespace MA_ETL_process
                     string line = "";
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        //line += reader.GetName(i) + ": " + reader.GetValue(i) + "   ";
-                        line += reader.GetName(i) + ": " + reader[i] + "   ";
+                        //line += reader.GetName(i) + ": " + reader.GetValue(i) + "   ";  // maybe a bit slower
+                        line += reader.GetName(i) + ": " + reader[i] + "   ";  // maybe a bit faster
+
                         // string reader[i].GetDataTypeName()  // fast
                         // Type reader[i].GetType() // slower than GetDataTypeName()
                         //                             ... at least on Debug-Console with text output in console
