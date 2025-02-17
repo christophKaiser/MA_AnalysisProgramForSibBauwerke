@@ -28,5 +28,9 @@ namespace MA_ETL_process
             // create and open a new connection to the SQL Server
             SqlClient sqlClient = new SqlClient();
         }
+
+        private void btn_SqlTest_Click(object sender, RoutedEventArgs e)
+        {
+        }
     }
 }
