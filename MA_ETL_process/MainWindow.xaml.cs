@@ -16,6 +16,8 @@ namespace MA_ETL_process
     /// </summary>
     public partial class MainWindow : Window
     {
+        SqlClient? sqlClient = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -26,7 +28,7 @@ namespace MA_ETL_process
         private void btn_SqlConnection_Click(object sender, RoutedEventArgs e)
         {
             // create and open a new connection to the SQL Server
-            SqlClient sqlClient = new SqlClient();
+            sqlClient = new SqlClient();
         }
 
         private void btn_SqlTest_Click(object sender, RoutedEventArgs e)
