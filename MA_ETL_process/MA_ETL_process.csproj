@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
+    <PackageReference Include="Neo4j.Driver" Version="5.27.0" />
+    <PackageReference Include="Neo4j.Driver.Simple" Version="5.27.0" />
   </ItemGroup>
 
 </Project>
