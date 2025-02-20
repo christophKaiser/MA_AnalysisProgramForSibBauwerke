@@ -84,5 +84,10 @@ namespace MA_ETL_process
             // call test function which creates a node in the Neo4j database
             neo4jDriver.PrintGreeting("hello world", 42, "42");
         }
+
+        private void btn_FirstTriple_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
