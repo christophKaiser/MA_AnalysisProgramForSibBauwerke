@@ -17,6 +17,7 @@ namespace MA_ETL_process
     public partial class MainWindow : Window
     {
         SqlClient? sqlClient = null;
+        Neo4jDriver? neo4jDriver = null;
 
         public MainWindow()
         {
@@ -58,6 +59,30 @@ namespace MA_ETL_process
                 WHERE [SIB_BAUWERKE_19_20230427].[dbo].[PRUF_DGF].[BWNR]=5527701");
 
             Utilities.ConsoleLog("'Test SQL Connection' finished");
+        }
+
+        private void btn_Neo4jConnection_Click(object sender, RoutedEventArgs e)
+        {
+            // start neo4j server
+            //System.Diagnostics.Process.Start(@"D:\\Christoph\\.Neo4jDesktop\\relate-data\\dbmss\\dbms-bd74cc49-cd57-461f-896f-a5a17a27ca1c\\bin\\neo4j.bat", "start").WaitForExit();
+
+            // creating a new driver to Neo4j, the server (DBMS) must be started inside Neo4j Desktop beforehand manually
+            neo4jDriver = new Neo4jDriver();
+
+            // stop neo4j server
+            //System.Diagnostics.Process.Start(@"D:\\Christoph\\.Neo4jDesktop\\relate-data\\dbmss\\dbms-bd74cc49-cd57-461f-896f-a5a17a27ca1c\\bin\\neo4j.bat", "stop").WaitForExit();
+        }
+
+        private void btn_Neo4jTest_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            // call test function which creates a node in the Neo4j database
+            neo4jDriver.PrintGreeting("hello world", 42, "42");
         }
     }
 }
