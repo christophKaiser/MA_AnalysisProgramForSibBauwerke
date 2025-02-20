@@ -94,10 +94,18 @@ namespace MA_ETL_process
             }
 
             Utilities.ConsoleLog("\nBauwerk:");
-            List<SibBW_GES_BW> bw = sqlClient.SelectRows<SibBW_GES_BW>(
+            List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(
                 @"SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
                 FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]
                 WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]=5527701");
+
+            foreach(SibBW_GES_BW bw in BWs)
+            {
+                bw.Teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
+                    $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
+                    FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
+                    WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}");
+            }
         }
     }
 }
