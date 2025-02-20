@@ -14,6 +14,11 @@ namespace MA_ETL_process
 
     internal class SibBW_GES_BW : SibBw
     {
+        public List<SibBW_TEIL_BW>? Teilbauwerke = null;
+    }
+
+    internal class SibBW_TEIL_BW : SibBw
+    {
 
     }
 }
