@@ -17,5 +17,6 @@ namespace MA_ETL_process
         public static string Neo4jUri = "bolt://localhost:<9999>";
         public static string Neo4jUser = "<user>";
         public static string Neo4jPassword = "<password>";
+        public static string Neo4jDatabase = "<database>";
     }
 }

@@ -22,7 +22,7 @@ namespace MA_ETL_process
 
         public void PrintGreeting(string message, int iInt, string iString)
         {
-            var session = _driver.Session();
+            var session = _driver.Session(o => o.WithDatabase(LoginCredentials.Neo4jDatabase));
             var greeting = session.ExecuteWrite(
                 tx =>
                 {
