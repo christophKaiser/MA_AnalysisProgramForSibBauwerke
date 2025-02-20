@@ -87,7 +87,17 @@ namespace MA_ETL_process
 
         private void btn_FirstTriple_Click(object sender, RoutedEventArgs e)
         {
+            if (sqlClient == null)
+            {
+                Utilities.ConsoleLog("no SQL connection");
+                return;
+            }
 
+            Utilities.ConsoleLog("\nBauwerk:");
+            List<SibBw> bw = sqlClient.SelectRows<SibBW_GES_BW>(
+                @"SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
+                FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]
+                WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]=5527701");
         }
     }
 }
