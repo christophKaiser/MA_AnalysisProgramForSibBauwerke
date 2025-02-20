@@ -75,6 +75,14 @@ namespace MA_ETL_process
 
         private void btn_Neo4jTest_Click(object sender, RoutedEventArgs e)
         {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            // call test function which creates a node in the Neo4j database
+            neo4jDriver.PrintGreeting("hello world", 42, "42");
         }
     }
 }

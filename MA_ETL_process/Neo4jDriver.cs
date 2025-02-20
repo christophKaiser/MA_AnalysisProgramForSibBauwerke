@@ -20,6 +20,28 @@ namespace MA_ETL_process
             // ToDo: was it realy successful?
         }
 
+        public void PrintGreeting(string message, int iInt, string iString)
+        {
+            var session = _driver.Session();
+            var greeting = session.ExecuteWrite(
+                tx =>
+                {
+                    // called function: Neo4j.Driver.IQueryRunner.Run(..)
+                    var result = tx.Run(
+                        "CREATE (a:Greeting) " +
+                        //"SET a.message = $message " +
+                        "SET a = {message: $message, iInt: $iInt, iString: $iString} " +
+                        "RETURN a.message + ', from node ' + id(a)",
+                        //new { messsage });
+                        new { message, iInt, iString }); // parameters of the query
+                                                         // test result: iInt is intager in neo4j, iString is string in neo4j
+
+                    return result.Single()[0].As<string>();
+                });
+
+            Utilities.ConsoleLog(greeting);
+        }
+
         public void Dispose()
         {
             _driver?.Dispose();
