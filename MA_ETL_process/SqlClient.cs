@@ -55,9 +55,9 @@ namespace MA_ETL_process
             }
         }
 
-        public List<SibBw> SelectRows<T>(string commandText) where T : SibBw, new()
+        public List<T> SelectRows<T>(string commandText) where T : SibBw, new()
         {
-            List<SibBw> sibBws = new List<SibBw>();
+            List<T> sibBws = new List<T>();
 
             using (var command = new SqlC.SqlCommand())
             {
@@ -69,7 +69,7 @@ namespace MA_ETL_process
 
                 while (reader.Read())
                 {
-                    SibBw sibBw = new T();
+                    T sibBw = new T();
 
                     string line = "";
                     for (int i = 0; i < reader.FieldCount; i++)
