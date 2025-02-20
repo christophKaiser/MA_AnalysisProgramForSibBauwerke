@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MA_ETL_process"
         mc:Ignorable="d"
-        Title="ETL-Process SIB-BW to neo4j" WindowState="Maximized" Height="450" Width="800">
+        Title="ETL-Process SIB-BW to neo4j" WindowState="Maximized" Height="800" Width="1700">
     <Grid x:Name="mainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -16,7 +16,15 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1" Margin="0 0 0 0"
+        <WrapPanel Grid.Column="0" Grid.Row="0">
+            <Button x:Name="btn_SqlConnection" Content="Open SQL Connection"
+                    Style="{StaticResource ButtonStyle}" Click="btn_SqlConnection_Click"/>
+            <Button x:Name="btn_SqlTest" Content="Test SQL Connection"
+                    Style="{StaticResource ButtonStyle}" Click="btn_SqlTest_Click"/>
+        </WrapPanel>
+
+        <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1"
+                 Margin="0 0 0 0" Padding="4 2"
                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                  ScrollViewer.HorizontalScrollBarVisibility="Visible"
                  TextWrapping="NoWrap" IsReadOnly="True"
