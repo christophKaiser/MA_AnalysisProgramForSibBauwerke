@@ -59,5 +59,13 @@ namespace MA_ETL_process
 
             Utilities.ConsoleLog("'Test SQL Connection' finished");
         }
+
+        private void btn_Neo4jConnection_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void btn_Neo4jTest_Click(object sender, RoutedEventArgs e)
+        {
+        }
     }
 }
