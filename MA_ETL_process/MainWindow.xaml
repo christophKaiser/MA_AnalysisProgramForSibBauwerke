@@ -27,6 +27,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jTest_Click"/>
             <Button x:Name="btn_FirstTriple" Content="Create first triple"
                     Style="{StaticResource ButtonStyle}" Click="btn_FirstTriple_Click"/>
+            <Button x:Name="btn_Neo4jDeleteAll" Content="Delete all in Neo4j DB"
+                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteAll_Click"/>
         </WrapPanel>
 
         <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1"

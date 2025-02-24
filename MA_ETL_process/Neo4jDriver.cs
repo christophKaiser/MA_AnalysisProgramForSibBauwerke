@@ -63,6 +63,11 @@ namespace MA_ETL_process
             }
         }
 
+        public void DeleteAllInDatabase()
+        {
+            ExecuteCypherQuery("MATCH (n) DETACH DELETE n");
+        }
+
         public void Dispose()
         {
             _driver?.Dispose();

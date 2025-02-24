@@ -119,6 +119,15 @@ namespace MA_ETL_process
             }
         }
 
+        private void btn_Neo4jDeleteAll_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            neo4jDriver.DeleteAllInDatabase();
         }
     }
 }
