@@ -44,6 +44,25 @@ namespace MA_ETL_process
             }
         }
 
+        private void ExecuteCypherQuery(string query)
+        {
+            using (var session = _driver.Session(o => o.WithDatabase(LoginCredentials.Neo4jDatabase)))
+            {
+                var result = session.Run(query);
+                //session.ExecuteWrite(
+                //    tx =>
+                //    {
+                //        // called function: Neo4j.Driver.IQueryRunner.Run(..)
+                //        var result = tx.Run(
+                //            new Query(query));
+                //        return;
+                //        //return result.Single()[0].As<string>();
+                //    });
+
+                //Utilities.ConsoleLog(greeting);
+            }
+        }
+
         public void Dispose()
         {
             _driver?.Dispose();
