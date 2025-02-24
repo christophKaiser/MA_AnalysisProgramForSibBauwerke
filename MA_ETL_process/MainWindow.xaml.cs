@@ -99,13 +99,26 @@ namespace MA_ETL_process
                 FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]
                 WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]=5527701");
 
+            Utilities.ConsoleLog("\nTeilbauwerke");
             foreach(SibBW_GES_BW bw in BWs)
             {
-                bw.Teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
+                bw.teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
                     $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
                     FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
                     WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}");
             }
+
+            Utilities.ConsoleLog("\n\nCyher-string Bauwerk:");
+            Utilities.ConsoleLog(BWs[0].GetCypherCreate("BWNR" + BWs[0].stringValues["BWNR"]));
+            // ToDo: ("BWNR" + BWs[0].stringValues["BWNR"]) in SibBw als property
+
+            Utilities.ConsoleLog("\nCypher-string Teilbauwerke:");
+            foreach (SibBW_TEIL_BW teilBw in BWs[0].teilbauwerke)
+            {
+                Utilities.ConsoleLog(teilBw.GetCypherCreate("ID_NR" + teilBw.stringValues["ID_NR"].Replace(" ", "_")));
+            }
+        }
+
         }
     }
 }
