@@ -39,19 +39,22 @@ namespace MA_ETL_process
 
     internal class SibBW_GES_BW : SibBw
     {
+        public string identifier { get { return "BWNR" + stringValues["BWNR"]; } }
         public List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
 
-        public string GetCypherCreate(string cypherIdentifier)
+        public string GetCypherCreate()
         {
-            return GetCypherCreate(cypherIdentifier, "GES_BW");
+            return GetCypherCreate(identifier, "GES_BW");
         }
     }
 
     internal class SibBW_TEIL_BW : SibBw
     {
-        public string GetCypherCreate(string cypherIdentifier)
+        public string identifier { get { return "ID_NR" + stringValues["ID_NR"].Replace(" ", "_"); } }
+
+        public string GetCypherCreate()
         {
-            return GetCypherCreate(cypherIdentifier, "TEIL_BW");
+            return GetCypherCreate(identifier, "TEIL_BW");
         }
     }
 }

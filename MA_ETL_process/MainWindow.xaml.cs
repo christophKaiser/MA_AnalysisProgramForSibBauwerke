@@ -109,13 +109,12 @@ namespace MA_ETL_process
             }
 
             Utilities.ConsoleLog("\n\nCyher-string Bauwerk:");
-            Utilities.ConsoleLog(BWs[0].GetCypherCreate("BWNR" + BWs[0].stringValues["BWNR"]));
-            // ToDo: ("BWNR" + BWs[0].stringValues["BWNR"]) in SibBw als property
+            Utilities.ConsoleLog(BWs[0].GetCypherCreate());
 
             Utilities.ConsoleLog("\nCypher-string Teilbauwerke:");
             foreach (SibBW_TEIL_BW teilBw in BWs[0].teilbauwerke)
             {
-                Utilities.ConsoleLog(teilBw.GetCypherCreate("ID_NR" + teilBw.stringValues["ID_NR"].Replace(" ", "_")));
+                Utilities.ConsoleLog(teilBw.GetCypherCreate());
             }
         }
 
