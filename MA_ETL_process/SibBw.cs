@@ -27,6 +27,7 @@ namespace MA_ETL_process
             foreach (KeyValuePair<string, string> kvp in stringValues)
             {
                 cypher += $"{kvp.Key}:'{kvp.Value}', ";
+                //kvp.Value.TrimEnd() // removes all whitespaces at the end of the string
             }
 
             // remove last "," in the cypher-string
