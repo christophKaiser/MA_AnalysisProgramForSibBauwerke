@@ -130,7 +130,6 @@ namespace MA_ETL_process
             }
 
             neo4jDriver.DeleteAllInDatabase();
-            Utilities.ConsoleLog("all entries from current Neo4j database deleted");
         }
     }
 }
