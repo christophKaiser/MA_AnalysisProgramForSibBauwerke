@@ -43,7 +43,7 @@ namespace MA_ETL_process
             }
         }
 
-        private void ExecuteCypherQuery(string query)
+        public void ExecuteCypherQuery(string query)
         {
             var result = _session.Run(query);
         }
