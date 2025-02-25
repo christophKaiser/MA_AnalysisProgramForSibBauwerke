@@ -36,6 +36,12 @@ namespace MA_ETL_process
             // close properties-parenthes and CREATE-parenthesis; return string
             return cypher += "})";
         }
+
+        protected string GetCypherMerge(string identifierBase, string identifierTarget, string label)
+        {
+            // MERGE (a)-[r:ACTED_IN]->(b) SET r.roles = ['Carol Danvers']
+            return $"MERGE ({identifierBase})-[:{label}]->({identifierTarget})";
+        }
     }
 
     internal class SibBW_GES_BW : SibBw
@@ -47,6 +53,17 @@ namespace MA_ETL_process
         public string GetCypherCreate()
         {
             return GetCypherCreate(identifier, label);
+        }
+
+        public string GetCypherCreateMerge_BW_TeilBWs()
+        {
+            string cypher = GetCypherCreate(identifier, label);
+            foreach (SibBW_TEIL_BW teilBW in teilbauwerke)
+            {
+                cypher += "\n" + teilBW.GetCypherCreate();
+                cypher += "\n" + GetCypherMerge(identifier, teilBW.identifier, "BW_TeilBW");
+            }
+            return cypher;
         }
     }
 

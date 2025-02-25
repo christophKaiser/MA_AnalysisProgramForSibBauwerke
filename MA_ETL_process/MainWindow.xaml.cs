@@ -116,6 +116,9 @@ namespace MA_ETL_process
             {
                 Utilities.ConsoleLog(teilBw.GetCypherCreate());
             }
+
+            Utilities.ConsoleLog("\n\nKombinierter Cypher-string für erste Tripel:");
+            Utilities.ConsoleLog(BWs[0].GetCypherCreateMerge_BW_TeilBWs());
         }
 
         private void btn_Neo4jDeleteAll_Click(object sender, RoutedEventArgs e)
