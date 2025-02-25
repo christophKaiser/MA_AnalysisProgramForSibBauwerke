@@ -24,39 +24,28 @@ namespace MA_ETL_process
 
         public void PrintGreeting(string message, int iInt, string iString)
         {
-            var greeting = _session.ExecuteWrite(
-                tx =>
-                {
-                    // called function: Neo4j.Driver.IQueryRunner.Run(..)
-                    var result = tx.Run(
-                        "CREATE (a:Greeting) " +
-                        //"SET a.message = $message " +
-                        "SET a = {message: $message, iInt: $iInt, iString: $iString} " +
-                        "RETURN a.message + ', from node ' + id(a)",
-                        //new { messsage });
-                        new { message, iInt, iString }); // parameters of the query
-                                                            // test result: iInt is intager in neo4j, iString is string in neo4j
+            // called function: Neo4j.Driver.IQueryRunner.Run(..)
+            var result = _session.Run(
+                "CREATE (a:Greeting) " +
+                //"SET a.message = $message " +
+                "SET a = {message: $message, iInt: $iInt, iString: $iString} \n" +
+                "CREATE (b:Greeting) SET b = {message: $message} \n" +
+                "RETURN a.message + ', from node ' + id(a), \n" +
+                "  b.message + ', from node ' + id(b)",
+                //new { messsage });
+                new { message, iInt, iString }).Single();
+            // test result: iInt is intager in neo4j, iString is string in neo4j
 
-                    return result.Single()[0].As<string>();
-                });
-
-            Utilities.ConsoleLog(greeting);
+            // console output of several Return / result entities
+            foreach (var item in result)
+            {
+                Utilities.ConsoleLog(item.Value.ToString());
+            }
         }
 
         private void ExecuteCypherQuery(string query)
         {
             var result = _session.Run(query);
-            //session.ExecuteWrite(
-            //    tx =>
-            //    {
-            //        // called function: Neo4j.Driver.IQueryRunner.Run(..)
-            //        var result = tx.Run(
-            //            new Query(query));
-            //        return;
-            //        //return result.Single()[0].As<string>();
-            //    });
-
-            //Utilities.ConsoleLog(greeting);
         }
 
         public void DeleteAllInDatabase()
