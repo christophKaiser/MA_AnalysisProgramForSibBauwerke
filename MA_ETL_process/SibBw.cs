@@ -41,21 +41,23 @@ namespace MA_ETL_process
     internal class SibBW_GES_BW : SibBw
     {
         public string identifier { get { return "BWNR" + stringValues["BWNR"]; } }
+        public string label = "GES_BW";
         public List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, "GES_BW");
+            return GetCypherCreate(identifier, label);
         }
     }
 
     internal class SibBW_TEIL_BW : SibBw
     {
         public string identifier { get { return "ID_NR" + stringValues["ID_NR"].Replace(" ", "_"); } }
+        public string label = "TEIL_BW";
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, "TEIL_BW");
+            return GetCypherCreate(identifier, label);
         }
     }
 }
