@@ -12,7 +12,7 @@ namespace MA_ETL_process
         private static TextBox? txtConsole;
         public static TextBox? SetTxtConsoleReference { set { txtConsole = value; } }
 
-        public static void ConsoleLog(string message)
+        public static void ConsoleLog(string? message)
         {
             if (txtConsole != null)
             {

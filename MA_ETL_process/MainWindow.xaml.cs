@@ -84,5 +84,60 @@ namespace MA_ETL_process
             // call test function which creates a node in the Neo4j database
             neo4jDriver.PrintGreeting("hello world", 42, "42");
         }
+
+        private void btn_FirstTriple_Click(object sender, RoutedEventArgs e)
+        {
+            if (sqlClient == null)
+            {
+                Utilities.ConsoleLog("no SQL connection");
+                return;
+            }
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            Utilities.ConsoleLog("\nBauwerk:");
+            List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(
+                @"SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
+                FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]
+                WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]=5527701");
+
+            Utilities.ConsoleLog("\nTeilbauwerke");
+            foreach(SibBW_GES_BW bw in BWs)
+            {
+                bw.teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
+                    $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
+                    FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
+                    WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}");
+            }
+
+            //Utilities.ConsoleLog("\n\nCyher-string Bauwerk:");
+            //Utilities.ConsoleLog(BWs[0].GetCypherCreate());
+
+            //Utilities.ConsoleLog("\nCypher-string Teilbauwerke:");
+            //foreach (SibBW_TEIL_BW teilBw in BWs[0].teilbauwerke)
+            //{
+            //    Utilities.ConsoleLog(teilBw.GetCypherCreate());
+            //}
+
+            string cypherString = BWs[0].GetCypherCreateMerge_BW_TeilBWs();
+            Utilities.ConsoleLog("\n\nKombinierter Cypher-string für erste Tripel:");
+            Utilities.ConsoleLog(cypherString);
+            neo4jDriver.ExecuteCypherQuery(cypherString);
+            Utilities.ConsoleLog("First triple created!");
+        }
+
+        private void btn_Neo4jDeleteAll_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            neo4jDriver.DeleteAllInDatabase();
+        }
     }
 }
