@@ -85,6 +85,30 @@ namespace MA_ETL_process
             neo4jDriver.PrintGreeting("hello world", 42, "42");
         }
 
+        private void btn_CreateConstraints_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            List<string> sibBw_labels = [];
+            sibBw_labels.Add(new SibBW_GES_BW().label);
+            sibBw_labels.Add(new SibBW_TEIL_BW().label);
+            SibBw sibBw_dummy = new SibBw();
+
+            foreach (string label in sibBw_labels)
+            {
+                string cypherString = sibBw_dummy.GetCypherConstraintKey(label);
+                Utilities.ConsoleLog(cypherString);
+                neo4jDriver.ExecuteCypherQuery(cypherString);
+                // neo4j requires the "CREATE CONSTRAINTS" to be single statements in _session.Run(..)
+            }
+
+            Utilities.ConsoleLog("created constriants");
+        }
+
         private void btn_FirstTriple_Click(object sender, RoutedEventArgs e)
         {
             if (sqlClient == null)

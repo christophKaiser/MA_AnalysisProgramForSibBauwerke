@@ -33,6 +33,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteConstraints_Click"/>
             </WrapPanel>
             <WrapPanel>
+                <Button x:Name="btn_CreateConstraints" Content="Create constraints"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreateConstraints_Click"/>
                 <Button x:Name="btn_FirstTriple" Content="Create first triple"
                     Style="{StaticResource ButtonStyle}" Click="btn_FirstTriple_Click"/>
             </WrapPanel>

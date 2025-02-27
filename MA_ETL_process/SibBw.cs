@@ -11,6 +11,12 @@ namespace MA_ETL_process
         public Dictionary<string, string> stringValues = new Dictionary<string, string>();
         public Dictionary<string, double> numberValues = new Dictionary<string, double>();
 
+        public string GetCypherConstraintKey(string label)
+        {
+            // CREATE CONSTRAINT constraint_name FOR (n:Label) REQUIRE n.property IS NODE KEY
+            return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
+        }
+
         protected string GetCypherCreate(string cypherIdentifier, string lable)
         {
             // CREATE (a:Person {name:'Brie Larson', born:1989})
