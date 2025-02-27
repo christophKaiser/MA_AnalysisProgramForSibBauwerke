@@ -43,15 +43,25 @@ namespace MA_ETL_process
             }
         }
 
-        public void ExecuteCypherQuery(string query)
+        public IResult ExecuteCypherQuery(string query)
         {
-            var result = _session.Run(query);
+            return _session.Run(query);
         }
 
         public void DeleteAllNodesInDatabase()
         {
             ExecuteCypherQuery("MATCH (n) DETACH DELETE n");
             Utilities.ConsoleLog("all entries from current Neo4j database deleted");
+        }
+
+        public void DeleteAllConstraintsInDatabase()
+        {
+            List<IRecord> records = ExecuteCypherQuery("SHOW CONSTRAINTS YIELD name").ToList();
+            foreach (IRecord record in records)
+            {
+                ExecuteCypherQuery($"DROP CONSTRAINT {record["name"]}");
+            }
+            Utilities.ConsoleLog("all constraints from current Neo4j database deleted");
         }
 
         public void Dispose()
