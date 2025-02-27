@@ -48,7 +48,7 @@ namespace MA_ETL_process
             var result = _session.Run(query);
         }
 
-        public void DeleteAllInDatabase()
+        public void DeleteAllNodesInDatabase()
         {
             ExecuteCypherQuery("MATCH (n) DETACH DELETE n");
             Utilities.ConsoleLog("all entries from current Neo4j database deleted");

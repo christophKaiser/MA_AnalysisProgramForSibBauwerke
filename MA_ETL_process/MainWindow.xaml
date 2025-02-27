@@ -27,8 +27,10 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jConnection_Click"/>
                 <Button x:Name="btn_Neo4jTest" Content="Test Neo4j Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jTest_Click"/>
-                <Button x:Name="btn_Neo4jDeleteAll" Content="Delete all in Neo4j DB"
-                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteAll_Click"/>
+                <Button x:Name="btn_Neo4jDeleteNodes" Content="Delete Nodes in Neo4j DB"
+                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteNodes_Click"/>
+                <Button x:Name="btn_Neo4jDeleteConstraints" Content="Delete Constraints in Neo4j DB"
+                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteConstraints_Click"/>
             </WrapPanel>
             <WrapPanel>
                 <Button x:Name="btn_FirstTriple" Content="Create first triple"

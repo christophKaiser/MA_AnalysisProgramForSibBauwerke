@@ -129,7 +129,7 @@ namespace MA_ETL_process
             Utilities.ConsoleLog("First triple created!");
         }
 
-        private void btn_Neo4jDeleteAll_Click(object sender, RoutedEventArgs e)
+        private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)
             {
@@ -137,7 +137,12 @@ namespace MA_ETL_process
                 return;
             }
 
-            neo4jDriver.DeleteAllInDatabase();
+            neo4jDriver.DeleteAllNodesInDatabase();
+        }
+
+        private void btn_Neo4jDeleteConstraints_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
