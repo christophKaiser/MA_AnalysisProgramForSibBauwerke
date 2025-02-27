@@ -11,11 +11,20 @@ namespace MA_ETL_process
         public Dictionary<string, string> stringValues = new Dictionary<string, string>();
         public Dictionary<string, double> numberValues = new Dictionary<string, double>();
 
+        public string GetCypherConstraintKey(string label)
+        {
+            // CREATE CONSTRAINT constraint_name FOR (n:Label) REQUIRE n.property IS NODE KEY
+            return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
+        }
+
         protected string GetCypherCreate(string cypherIdentifier, string lable)
         {
             // CREATE (a:Person {name:'Brie Larson', born:1989})
             // initialize CREATE
             string cypher = $"CREATE ({cypherIdentifier}:{lable} {{";
+
+            // add identifier as required property
+            cypher += $"identifier:'{cypherIdentifier}', ";
 
             // add numberValues as properties
             foreach (KeyValuePair<string, double> kvp in numberValues)
@@ -30,7 +39,7 @@ namespace MA_ETL_process
                 //kvp.Value.TrimEnd() // removes all whitespaces at the end of the string
             }
 
-            // remove last "," in the cypher-string
+            // remove last ", " in the cypher-string
             cypher = cypher.Remove(cypher.Length - 2, 1) ;
 
             // close properties-parenthes and CREATE-parenthesis; return string
@@ -57,7 +66,7 @@ namespace MA_ETL_process
 
         public string GetCypherCreateMerge_BW_TeilBWs()
         {
-            string cypher = GetCypherCreate(identifier, label);
+            string cypher = GetCypherCreate();
             foreach (SibBW_TEIL_BW teilBW in teilbauwerke)
             {
                 cypher += "\n" + teilBW.GetCypherCreate();
