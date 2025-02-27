@@ -57,7 +57,7 @@ namespace MA_ETL_process
 
         public string GetCypherCreateMerge_BW_TeilBWs()
         {
-            string cypher = GetCypherCreate(identifier, label);
+            string cypher = GetCypherCreate();
             foreach (SibBW_TEIL_BW teilBW in teilbauwerke)
             {
                 cypher += "\n" + teilBW.GetCypherCreate();
