@@ -37,6 +37,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateConstraints_Click"/>
                 <Button x:Name="btn_FirstTriple" Content="Create first triple"
                     Style="{StaticResource ButtonStyle}" Click="btn_FirstTriple_Click"/>
+                <Button x:Name="btn_CreateAllBridges" Content="Create all bridges"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreateAllBridges_Click"/>
             </WrapPanel>
         </StackPanel>
 
