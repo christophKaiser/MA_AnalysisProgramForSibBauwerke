@@ -15,21 +15,27 @@
             <RowDefinition Height="140"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-
-        <WrapPanel Grid.Column="0" Grid.Row="0">
-            <Button x:Name="btn_SqlConnection" Content="Open SQL Connection"
+        <StackPanel Grid.Column="0" Grid.Row="0">
+            <WrapPanel>
+                <Button x:Name="btn_SqlConnection" Content="Open SQL Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_SqlConnection_Click"/>
-            <Button x:Name="btn_SqlTest" Content="Test SQL Connection"
+                <Button x:Name="btn_SqlTest" Content="Test SQL Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_SqlTest_Click"/>
-            <Button x:Name="btn_Neo4jConnection" Content="Open Neo4j Connection"
+            </WrapPanel>
+            <WrapPanel>
+                <Button x:Name="btn_Neo4jConnection" Content="Open Neo4j Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jConnection_Click"/>
-            <Button x:Name="btn_Neo4jTest" Content="Test Neo4j Connection"
+                <Button x:Name="btn_Neo4jTest" Content="Test Neo4j Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jTest_Click"/>
-            <Button x:Name="btn_FirstTriple" Content="Create first triple"
-                    Style="{StaticResource ButtonStyle}" Click="btn_FirstTriple_Click"/>
-            <Button x:Name="btn_Neo4jDeleteAll" Content="Delete all in Neo4j DB"
+                <Button x:Name="btn_Neo4jDeleteAll" Content="Delete all in Neo4j DB"
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteAll_Click"/>
-        </WrapPanel>
+            </WrapPanel>
+            <WrapPanel>
+                <Button x:Name="btn_FirstTriple" Content="Create first triple"
+                    Style="{StaticResource ButtonStyle}" Click="btn_FirstTriple_Click"/>
+            </WrapPanel>
+        </StackPanel>
+
 
         <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1"
                  Margin="0 0 0 0" Padding="4 2"
