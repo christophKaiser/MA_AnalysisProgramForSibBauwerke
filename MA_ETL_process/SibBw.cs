@@ -23,6 +23,9 @@ namespace MA_ETL_process
             // initialize CREATE
             string cypher = $"CREATE ({cypherIdentifier}:{lable} {{";
 
+            // add identifier as required property
+            cypher += $"identifier:'{cypherIdentifier}', ";
+
             // add numberValues as properties
             foreach (KeyValuePair<string, double> kvp in numberValues)
             {
@@ -36,7 +39,7 @@ namespace MA_ETL_process
                 //kvp.Value.TrimEnd() // removes all whitespaces at the end of the string
             }
 
-            // remove last "," in the cypher-string
+            // remove last ", " in the cypher-string
             cypher = cypher.Remove(cypher.Length - 2, 1) ;
 
             // close properties-parenthes and CREATE-parenthesis; return string
