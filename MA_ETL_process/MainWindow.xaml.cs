@@ -191,6 +191,15 @@ namespace MA_ETL_process
                     WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}");
             }
 
+            btn_CreateConstraints_Click(sender, e);
+
+            foreach (SibBW_GES_BW BW in BWs)
+            {
+                neo4jDriver.ExecuteCypherQuery(BW.GetCypherCreateMerge_BW_TeilBWs());
+            }
+            Utilities.ConsoleLog("created neo4j nodes and relationships");
+
+            Utilities.ConsoleLog("'Create all bridges' finished");
         }
 
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
