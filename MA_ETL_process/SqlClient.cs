@@ -83,7 +83,7 @@ namespace MA_ETL_process
                         // Type reader[i].GetType() // slower than GetDataTypeName()
                         //                             ... at least on Debug-Console with text output in console
                     }
-                    Utilities.ConsoleLog(line);
+                    //Utilities.ConsoleLog(line);
                     sibBws.Add(sibBw);
                 }
 

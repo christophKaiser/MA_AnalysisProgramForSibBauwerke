@@ -174,6 +174,22 @@ namespace MA_ETL_process
             bridgeNumbers = bridgeNumbers.Distinct().ToList();
             // bridgeNumbers.Count(): 17504
 
+            Utilities.ConsoleLog("\nBauwerke:");
+            List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(
+                // ... SELECT TOP (100) [BWNR], ...
+                $@"SELECT TOP (100) [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
+                FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]
+                WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]
+                IN ('{String.Join("', '", bridgeNumbers)}')");
+
+            Utilities.ConsoleLog("\nTeilbauwerke");
+            foreach (SibBW_GES_BW bw in BWs)
+            {
+                bw.teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
+                    $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
+                    FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
+                    WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}");
+            }
 
         }
 
