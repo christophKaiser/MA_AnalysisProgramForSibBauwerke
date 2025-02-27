@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -155,6 +156,24 @@ namespace MA_ETL_process
 
         private void btn_CreateAllBridges_Click(object sender, RoutedEventArgs e)
         {
+            if (sqlClient == null)
+            {
+                Utilities.ConsoleLog("no SQL connection");
+                return;
+            }
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            List<string> bridgeNumbers = sqlClient.SelectRowsOneColumn("BRUECKE", "BWNR");
+            // bridgeNumbers.Count(): 20349
+
+            // remove dublicates in the list (because one entry for each Teilbauwerk)
+            bridgeNumbers = bridgeNumbers.Distinct().ToList();
+            // bridgeNumbers.Count(): 17504
+
 
         }
 
