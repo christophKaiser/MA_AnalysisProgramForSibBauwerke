@@ -86,4 +86,15 @@ namespace MA_ETL_process
             return GetCypherCreate(identifier, label);
         }
     }
+
+    internal class SibBW_PRUFALT : SibBw
+    {
+        public string identifier { get { return "ID_NR" + stringValues["ID_NR"].Replace(" ", "_"); } }
+        public string label = "PRUFALT";
+
+        public string GetCypherCreate()
+        {
+            return GetCypherCreate(identifier, label);
+        }
+    }
 }
