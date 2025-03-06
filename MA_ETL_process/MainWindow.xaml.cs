@@ -249,9 +249,9 @@ namespace MA_ETL_process
             }
 
             var x = neo4jDriver.ExecuteCypherQuery(
-                "MATCH (bw:GES_BW)\r\n" +
-                "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
-                "MERGE (bw)-[r:bw_teilBw]->(teilBw)\r\n" +
+                "MATCH (bw:GES_BW)\r\n" +
+                "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
+                "MERGE (bw)-[r:bw_teilBw]->(teilBw)\r\n" +
                 "RETURN count(r)").ToList();
 
             Utilities.ConsoleLog($"relationships created, there are {x[0]["count(r)"]} relationships fitting the pattern");
