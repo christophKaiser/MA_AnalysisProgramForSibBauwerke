@@ -39,6 +39,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_FirstTriple_Click"/>
                 <Button x:Name="btn_CreateAllBridges" Content="Create all bridges without relationships"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateAllBridges_Click"/>
+                <Button x:Name="btn_CreateRelationshipsAllBridges" Content="Create relationships between all bridges"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreateRelationshipsAllBridges_Click"/>
             </WrapPanel>
         </StackPanel>
 

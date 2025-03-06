@@ -207,6 +207,22 @@ namespace MA_ETL_process
             Utilities.ConsoleLog("'Create all bridges' finished");
         }
 
+        private void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            neo4jDriver.ExecuteCypherQuery(
+                "MATCH (bw:GES_BW)\r\n" +
+                "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
+                "MERGE (bw)-[:bw_teilBw]->(teilBw)\r\n");
+
+            Utilities.ConsoleLog("relationships created");
+        }
+
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)
