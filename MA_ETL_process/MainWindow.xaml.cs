@@ -174,10 +174,13 @@ namespace MA_ETL_process
             bridgeNumbers = bridgeNumbers.Distinct().ToList();
             // bridgeNumbers.Count(): 17504
 
+            // test-purpose: trim to x bridgeNumbers
+            bridgeNumbers = bridgeNumbers.GetRange(0, 100);
+
             Utilities.ConsoleLog("\nBauwerke:");
             List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(
                 // ... SELECT TOP (100) [BWNR], ...
-                $@"SELECT TOP (100) [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
+                $@"SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
                 FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]
                 WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]
                 IN ('{String.Join("', '", bridgeNumbers)}')");
