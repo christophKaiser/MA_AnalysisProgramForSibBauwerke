@@ -197,14 +197,18 @@ namespace MA_ETL_process
 
             btn_CreateConstraints_Click(sender, e);
 
+            string query = "";
             foreach (SibBW_GES_BW BW in BWs)
             {
-                neo4jDriver.ExecuteCypherQuery(BW.GetCypherCreate());
+                query += BW.GetCypherCreate() + "\n";
             }
+            neo4jDriver.ExecuteCypherQuery(query);
+            query = "";
             foreach (SibBW_TEIL_BW teil_BW in teilbauwerke)
             {
-                neo4jDriver.ExecuteCypherQuery(teil_BW.GetCypherCreate());
+                query += teil_BW.GetCypherCreate() +"\n";
             }
+            neo4jDriver.ExecuteCypherQuery(query);
             Utilities.ConsoleLog("created neo4j nodes, no relationships created");
 
             Utilities.ConsoleLog("'Create all bridges' finished");
