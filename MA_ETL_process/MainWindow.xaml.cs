@@ -216,6 +216,24 @@ namespace MA_ETL_process
             query = "";
             teilbauwerke.Clear();
 
+            // ---
+
+            Utilities.ConsoleLog("\nPrüfungen Alt");
+            List<SibBW_PRUFALT> pruefungenAlt_List = sqlClient.SelectRows<SibBW_PRUFALT>(
+                "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], " +
+                "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], " +
+                "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]" +
+                "FROM[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT]" +
+                "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT].[BWNR]" +
+                $"IN('{String.Join("', '", bridgeNumbers)}')");
+
+            foreach (SibBW_PRUFALT pruefungAlt in pruefungenAlt_List)
+            {
+                query += pruefungAlt.GetCypherCreate() + "\n";
+            }
+            neo4jDriver.ExecuteCypherQuery(query);
+            query = "";
+            teilbauwerke.Clear();
 
             Utilities.ConsoleLog("created neo4j nodes, no relationships created");
 

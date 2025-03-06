@@ -89,7 +89,8 @@ namespace MA_ETL_process
 
     internal class SibBW_PRUFALT : SibBw
     {
-        public string identifier { get { return "ID_NR" + stringValues["ID_NR"].Replace(" ", "_"); } }
+        public string identifier { get { return "ID_NR" + stringValues["ID_NR"].Replace(" ", "_") + 
+                    "_" + stringValues["PRUFJAHR"] + "_" + stringValues["PRUFART"]; } }
         public string label = "PRUFALT";
 
         public string GetCypherCreate()
