@@ -35,7 +35,7 @@ namespace MA_ETL_process
             // add stringValues as properties
             foreach (KeyValuePair<string, string> kvp in stringValues)
             {
-                cypher += $"{kvp.Key}:'{kvp.Value}', ";
+                cypher += $"{kvp.Key}:'{kvp.Value.Replace("'", "\\'")}', ";
                 //kvp.Value.TrimEnd() // removes all whitespaces at the end of the string
             }
 

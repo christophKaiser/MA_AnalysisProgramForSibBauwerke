@@ -83,7 +83,7 @@ namespace MA_ETL_process
                         // Type reader[i].GetType() // slower than GetDataTypeName()
                         //                             ... at least on Debug-Console with text output in console
                     }
-                    Utilities.ConsoleLog(line);
+                    //Utilities.ConsoleLog(line);
                     sibBws.Add(sibBw);
                 }
 
@@ -91,6 +91,30 @@ namespace MA_ETL_process
             }
             return sibBws;
             // get type(string) of list objects: sibBws[0].GetType().Name
+        }
+
+        public List<string> SelectRowsOneColumn(string table, string column)
+        {
+            List<string> result = new List<string>();
+
+            using (var command = new SqlC.SqlCommand())
+            {
+                command.Connection = _connection;
+                command.CommandType = CommandType.Text;
+                command.CommandText =
+                    $"SELECT {column} FROM [SIB_BAUWERKE_19_20230427].[dbo].[{table}]";
+
+                SqlC.SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    result.Add(reader.GetValue(0).ToString());
+                }
+
+                reader.Close();
+            }
+
+            return result;
         }
     }
 }
