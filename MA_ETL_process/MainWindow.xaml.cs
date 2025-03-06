@@ -177,7 +177,13 @@ namespace MA_ETL_process
             // test-purpose: trim to x bridgeNumbers
             bridgeNumbers = bridgeNumbers.GetRange(0, 50);
 
-            Utilities.ConsoleLog("\nBauwerke:");
+            btn_CreateConstraints_Click(sender, e);
+
+            string query = "";
+
+            // ---
+
+            Utilities.ConsoleLog("\nBauwerke");
             List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(
                 // ... SELECT TOP (100) [BWNR], ...
                 $@"SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
@@ -185,30 +191,32 @@ namespace MA_ETL_process
                 WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]
                 IN ('{String.Join("', '", bridgeNumbers)}')");
 
-            Utilities.ConsoleLog("\nTeilbauwerke");
-            List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
-            foreach (SibBW_GES_BW bw in BWs)
-            {
-                teilbauwerke.AddRange(sqlClient.SelectRows<SibBW_TEIL_BW>(
-                    $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
-                    FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
-                    WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}"));
-            }
-
-            btn_CreateConstraints_Click(sender, e);
-
-            string query = "";
             foreach (SibBW_GES_BW BW in BWs)
             {
                 query += BW.GetCypherCreate() + "\n";
             }
             neo4jDriver.ExecuteCypherQuery(query);
             query = "";
+            BWs.Clear();
+
+            // ---
+
+            Utilities.ConsoleLog("\nTeilbauwerke");
+            List<SibBW_TEIL_BW> teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
+                $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
+                FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
+                WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]
+                IN ('{String.Join("', '", bridgeNumbers)}')");
+
             foreach (SibBW_TEIL_BW teil_BW in teilbauwerke)
             {
-                query += teil_BW.GetCypherCreate() +"\n";
+                query += teil_BW.GetCypherCreate() + "\n";
             }
             neo4jDriver.ExecuteCypherQuery(query);
+            query = "";
+            teilbauwerke.Clear();
+
+
             Utilities.ConsoleLog("created neo4j nodes, no relationships created");
 
             Utilities.ConsoleLog("'Create all bridges' finished");
