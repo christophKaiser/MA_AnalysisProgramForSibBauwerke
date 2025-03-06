@@ -195,9 +195,13 @@ namespace MA_ETL_process
 
             foreach (SibBW_GES_BW BW in BWs)
             {
-                neo4jDriver.ExecuteCypherQuery(BW.GetCypherCreateMerge_BW_TeilBWs());
+                neo4jDriver.ExecuteCypherQuery(BW.GetCypherCreate());
+                foreach (SibBW_TEIL_BW teil_BW in BW.teilbauwerke)
+                {
+                    neo4jDriver.ExecuteCypherQuery(teil_BW.GetCypherCreate());
+                }
             }
-            Utilities.ConsoleLog("created neo4j nodes and relationships");
+            Utilities.ConsoleLog("created neo4j nodes, no relationships created");
 
             Utilities.ConsoleLog("'Create all bridges' finished");
         }
