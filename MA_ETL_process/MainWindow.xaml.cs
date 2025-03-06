@@ -174,32 +174,61 @@ namespace MA_ETL_process
             bridgeNumbers = bridgeNumbers.Distinct().ToList();
             // bridgeNumbers.Count(): 17504
 
+            // test-purpose: trim to x bridgeNumbers
+            bridgeNumbers = bridgeNumbers.GetRange(0, 50);
+
             Utilities.ConsoleLog("\nBauwerke:");
             List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(
                 // ... SELECT TOP (100) [BWNR], ...
-                $@"SELECT TOP (100) [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
+                $@"SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
                 FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]
                 WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]
                 IN ('{String.Join("', '", bridgeNumbers)}')");
 
             Utilities.ConsoleLog("\nTeilbauwerke");
+            List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
             foreach (SibBW_GES_BW bw in BWs)
             {
-                bw.teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
+                teilbauwerke.AddRange(sqlClient.SelectRows<SibBW_TEIL_BW>(
                     $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
                     FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
-                    WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}");
+                    WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}"));
             }
 
             btn_CreateConstraints_Click(sender, e);
 
+            string query = "";
             foreach (SibBW_GES_BW BW in BWs)
             {
-                neo4jDriver.ExecuteCypherQuery(BW.GetCypherCreateMerge_BW_TeilBWs());
+                query += BW.GetCypherCreate() + "\n";
             }
-            Utilities.ConsoleLog("created neo4j nodes and relationships");
+            neo4jDriver.ExecuteCypherQuery(query);
+            query = "";
+            foreach (SibBW_TEIL_BW teil_BW in teilbauwerke)
+            {
+                query += teil_BW.GetCypherCreate() +"\n";
+            }
+            neo4jDriver.ExecuteCypherQuery(query);
+            Utilities.ConsoleLog("created neo4j nodes, no relationships created");
 
             Utilities.ConsoleLog("'Create all bridges' finished");
+        }
+
+        private void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            var x = neo4jDriver.ExecuteCypherQuery(
+                "MATCH (bw:GES_BW)\r\n" +
+                "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
+                "MERGE (bw)-[r:bw_teilBw]->(teilBw)\r\n" +
+                "RETURN count(r)").ToList();
+
+            Utilities.ConsoleLog($"relationships created, there are {x[0]["count(r)"]} relationships fitting the pattern");
         }
 
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
