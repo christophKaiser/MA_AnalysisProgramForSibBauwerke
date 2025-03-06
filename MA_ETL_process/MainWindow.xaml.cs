@@ -183,12 +183,13 @@ namespace MA_ETL_process
                 IN ('{String.Join("', '", bridgeNumbers)}')");
 
             Utilities.ConsoleLog("\nTeilbauwerke");
+            List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
             foreach (SibBW_GES_BW bw in BWs)
             {
-                bw.teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
+                teilbauwerke.AddRange(sqlClient.SelectRows<SibBW_TEIL_BW>(
                     $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
                     FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
-                    WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}");
+                    WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]={bw.stringValues["BWNR"]}"));
             }
 
             btn_CreateConstraints_Click(sender, e);
@@ -196,10 +197,10 @@ namespace MA_ETL_process
             foreach (SibBW_GES_BW BW in BWs)
             {
                 neo4jDriver.ExecuteCypherQuery(BW.GetCypherCreate());
-                foreach (SibBW_TEIL_BW teil_BW in BW.teilbauwerke)
-                {
-                    neo4jDriver.ExecuteCypherQuery(teil_BW.GetCypherCreate());
-                }
+            }
+            foreach (SibBW_TEIL_BW teil_BW in teilbauwerke)
+            {
+                neo4jDriver.ExecuteCypherQuery(teil_BW.GetCypherCreate());
             }
             Utilities.ConsoleLog("created neo4j nodes, no relationships created");
 
