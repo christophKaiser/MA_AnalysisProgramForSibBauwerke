@@ -179,7 +179,7 @@ namespace MA_ETL_process
             Utilities.ConsoleLog("\nBauwerke mit Teilbauwerke:");
 
             // test-purpose: trim to x bridgeNumbers
-            bridgeNumbers = bridgeNumbers.GetRange(0, 100);
+            bridgeNumbers = bridgeNumbers.GetRange(0, 50);
 
             foreach (string bridgeNumber in bridgeNumbers)
             {
