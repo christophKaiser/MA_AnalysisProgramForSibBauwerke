@@ -175,7 +175,7 @@ namespace MA_ETL_process
             // bridgeNumbers.Count(): 17504
 
             // test-purpose: trim to x bridgeNumbers
-            bridgeNumbers = bridgeNumbers.GetRange(0, 100);
+            bridgeNumbers = bridgeNumbers.GetRange(0, 50);
 
             Utilities.ConsoleLog("\nBauwerke:");
             List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(
