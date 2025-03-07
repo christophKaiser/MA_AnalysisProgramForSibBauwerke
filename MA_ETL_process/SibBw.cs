@@ -17,7 +17,9 @@ namespace MA_ETL_process
             return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
         }
 
-        protected string GetCypherCreate(string cypherIdentifier, string lable)
+        protected string GetCypherCreate(
+           string cypherIdentifier, string lable, 
+           KeyValuePair<string, string> cypherIdentifierCustom = new KeyValuePair<string, string>())
         {
             // CREATE (a:Person {name:'Brie Larson', born:1989})
             // initialize CREATE
@@ -25,6 +27,11 @@ namespace MA_ETL_process
 
             // add identifier as required property
             cypher += $"identifier:'{cypherIdentifier}', ";
+
+            if (cypherIdentifierCustom.Key != null)
+            {
+                cypher += $"{cypherIdentifierCustom.Key}:'{cypherIdentifierCustom.Value}', ";
+            }
 
             // add numberValues as properties
             foreach (KeyValuePair<string, double> kvp in numberValues)
@@ -101,7 +108,13 @@ namespace MA_ETL_process
 
     internal class SibBW_SCHADFALT : SibBw
     {
-        public string identifier
+        public string identifier { get {
+                // ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
+                return ("ID_NR" + stringValues["ID_NR"] + "_" + stringValues["PRUFJAHR"] 
+                    + "_" + stringValues["PRA"] + "_" + stringValues["IDENT"]).Replace(" ", "_");
+            }
+        }
+        public string identifierPruf
         {
             get
             {
@@ -114,7 +127,7 @@ namespace MA_ETL_process
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label);
+            return GetCypherCreate(identifier, label, KeyValuePair.Create("identifierPruf", identifierPruf));
         }
     }
 }
