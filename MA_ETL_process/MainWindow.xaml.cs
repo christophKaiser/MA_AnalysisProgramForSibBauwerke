@@ -293,6 +293,14 @@ namespace MA_ETL_process
                 "RETURN count(r)").ToList();
 
             Utilities.ConsoleLog($"relationships created, there are {y[0]["count(r)"]} relationships fitting the pattern");
+
+            var z = neo4jDriver.ExecuteCypherQuery(
+                "MATCH (prufAlt:PRUFALT)\r\n" +
+                "MATCH (schadAlt:SCHADALT) WHERE prufAlt.identifier = schadAlt.identifierPruf\r\n" +
+                "MERGE (prufAlt)-[r:prufAlt_schadAlt]->(schadAlt)\r\n" +
+                "RETURN count(r)").ToList();
+
+            Utilities.ConsoleLog($"relationships created, there are {z[0]["count(r)"]} relationships fitting the pattern");
         }
 
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
