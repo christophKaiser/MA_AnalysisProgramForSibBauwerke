@@ -98,4 +98,23 @@ namespace MA_ETL_process
             return GetCypherCreate(identifier, label);
         }
     }
+
+    internal class SibBW_SCHADFALT : SibBw
+    {
+        public string identifier
+        {
+            get
+            {
+                // ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
+                return "ID_NR" + stringValues["ID_NR"].Replace(" ", "_") +
+                    "_" + stringValues["PRUFJAHR"] + "_" + stringValues["PRA"];
+            }
+        }
+        public string label = "SCHADALT";
+
+        public string GetCypherCreate()
+        {
+            return GetCypherCreate(identifier, label);
+        }
+    }
 }
