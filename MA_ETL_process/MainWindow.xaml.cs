@@ -97,8 +97,10 @@ namespace MA_ETL_process
             List<string> sibBw_labels = [];
             sibBw_labels.Add(new SibBW_GES_BW().label);
             sibBw_labels.Add(new SibBW_TEIL_BW().label);
-            SibBw sibBw_dummy = new SibBw();
+            sibBw_labels.Add(new SibBW_PRUFALT().label);
+            sibBw_labels.Add(new SibBW_SCHADFALT().label);
 
+            SibBw sibBw_dummy = new SibBw();
             foreach (string label in sibBw_labels)
             {
                 string cypherString = sibBw_dummy.GetCypherConstraintKey(label);
