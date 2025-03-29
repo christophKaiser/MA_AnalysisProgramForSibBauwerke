@@ -250,7 +250,7 @@ namespace MA_ETL_process
             }
             neo4jDriver.ExecuteCypherQuery(query);
             query = "";
-            teilbauwerke.Clear();
+            pruefungenAlt_List.Clear();
 
             // ---
 
@@ -283,7 +283,7 @@ namespace MA_ETL_process
             }
             neo4jDriver.ExecuteCypherQuery(query);
             query = "";
-            teilbauwerke.Clear();
+            schadAlt_List.Clear();
 
             // ---
 
