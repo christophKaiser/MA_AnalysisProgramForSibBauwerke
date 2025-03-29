@@ -321,6 +321,8 @@ namespace MA_ETL_process
                 return;
             }
 
+            Stopwatch sw = Stopwatch.StartNew();
+
             var x = neo4jDriver.ExecuteCypherQuery(
                 "MATCH (bw:GES_BW)\r\n" +
                 "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
@@ -344,6 +346,9 @@ namespace MA_ETL_process
                 "RETURN count(r)").ToList();
 
             Utilities.ConsoleLog($"relationships created, there are {z[0]["count(r)"]} relationships fitting the pattern");
+
+            sw.Stop();
+            Utilities.ConsoleLog($"all relationships created in time {sw.Elapsed}");
         }
 
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
