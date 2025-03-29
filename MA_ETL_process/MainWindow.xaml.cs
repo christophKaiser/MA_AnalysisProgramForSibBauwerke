@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace MA_ETL_process
 {
@@ -300,12 +301,14 @@ namespace MA_ETL_process
             schadAlt_List.Clear();
 
             // ---
+            Stopwatch sw = Stopwatch.StartNew();
             foreach (string queryTemp in queries)
             {
                 neo4jDriver.ExecuteCypherQuery(queryTemp);
             }
+            sw.Stop();
 
-            Utilities.ConsoleLog("created neo4j nodes, no relationships created");
+            Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
 
             Utilities.ConsoleLog("'Create all bridges' finished");
         }
