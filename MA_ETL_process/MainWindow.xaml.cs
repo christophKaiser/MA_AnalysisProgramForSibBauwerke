@@ -207,6 +207,7 @@ namespace MA_ETL_process
             }
             //neo4jDriver.ExecuteCypherQuery(query);
             queries.Add(query);
+            Utilities.ConsoleLog($"sent {BWs.Count} CREATE statements in total for GES_BW");
             query = "";
             BWs.Clear();
 
@@ -231,6 +232,7 @@ namespace MA_ETL_process
             }
             //neo4jDriver.ExecuteCypherQuery(query);
             queries.Add(query);
+            Utilities.ConsoleLog($"sent {teilbauwerke.Count} CREATE statements in total for TEIL_BW");
             query = "";
             teilbauwerke.Clear();
 
@@ -257,6 +259,7 @@ namespace MA_ETL_process
             }
             //neo4jDriver.ExecuteCypherQuery(query);
             queries.Add(query);
+            Utilities.ConsoleLog($"sent {pruefungenAlt_List.Count} CREATE statements in total for PRUFALT");
             query = "";
             pruefungenAlt_List.Clear();
 
@@ -292,6 +295,7 @@ namespace MA_ETL_process
             }
             //neo4jDriver.ExecuteCypherQuery(query);
             queries.Add(query);
+            Utilities.ConsoleLog($"sent {schadAlt_List.Count} CREATE statements in total for SCHADFALT");
             query = "";
             schadAlt_List.Clear();
 
