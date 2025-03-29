@@ -17,7 +17,9 @@ namespace MA_ETL_process
             return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
         }
 
-        protected string GetCypherCreate(string cypherIdentifier, string lable)
+        protected string GetCypherCreate(
+           string cypherIdentifier, string lable, 
+           KeyValuePair<string, string> cypherIdentifierCustom = new KeyValuePair<string, string>())
         {
             // CREATE (a:Person {name:'Brie Larson', born:1989})
             // initialize CREATE
@@ -25,6 +27,11 @@ namespace MA_ETL_process
 
             // add identifier as required property
             cypher += $"identifier:'{cypherIdentifier}', ";
+
+            if (cypherIdentifierCustom.Key != null)
+            {
+                cypher += $"{cypherIdentifierCustom.Key}:'{cypherIdentifierCustom.Value}', ";
+            }
 
             // add numberValues as properties
             foreach (KeyValuePair<string, double> kvp in numberValues)
@@ -55,7 +62,7 @@ namespace MA_ETL_process
 
     internal class SibBW_GES_BW : SibBw
     {
-        public string identifier { get { return "BWNR" + stringValues["BWNR"]; } }
+        public string identifier { get { return ("BWNR" + stringValues["BWNR"]).Replace(" ", "_"); } }
         public string label = "GES_BW";
         public List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
 
@@ -78,12 +85,49 @@ namespace MA_ETL_process
 
     internal class SibBW_TEIL_BW : SibBw
     {
-        public string identifier { get { return "ID_NR" + stringValues["ID_NR"].Replace(" ", "_"); } }
+        public string identifier { get { return ("ID_NR" + stringValues["ID_NR"]).Replace(" ", "_"); } }
         public string label = "TEIL_BW";
 
         public string GetCypherCreate()
         {
             return GetCypherCreate(identifier, label);
+        }
+    }
+
+    internal class SibBW_PRUFALT : SibBw
+    {
+        public string identifier { get { return ("ID_NR" + stringValues["ID_NR"] + 
+                    "_" + stringValues["PRUFJAHR"] + "_" + stringValues["PRUFART"]).Replace(" ", "_"); } }
+        public string label = "PRUFALT";
+
+        public string GetCypherCreate()
+        {
+            return GetCypherCreate(identifier, label);
+        }
+    }
+
+    internal class SibBW_SCHADFALT : SibBw
+    {
+        public string identifier { get {
+                // ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
+                return ("ID_NR" + stringValues["ID_NR"] + "_" + stringValues["PRUFJAHR"] 
+                    + "_" + stringValues["PRA"] + "_" + stringValues["IDENT"]).Replace(" ", "_");
+            }
+        }
+        public string identifierPruf
+        {
+            get
+            {
+                // ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
+                return ("ID_NR" + stringValues["ID_NR"].Replace(" ", "_") +
+                    "_" + stringValues["PRUFJAHR"] + "_" + stringValues["PRA"]).Replace(" ", "_");
+            }
+        }
+        public string label = "SCHADALT";
+
+        public string GetCypherCreate()
+        {
+            return GetCypherCreate(identifier, label, KeyValuePair.Create("identifierPruf", identifierPruf));
         }
     }
 }
