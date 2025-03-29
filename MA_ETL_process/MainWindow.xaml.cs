@@ -183,7 +183,7 @@ namespace MA_ETL_process
             btn_CreateConstraints_Click(sender, e);
 
             string query = "";
-            int queryMaxLength = 750000;
+            int queryMaxLength = 1500000;
             List<string> queries = new List<string>();
 
             // ---
