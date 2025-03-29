@@ -182,6 +182,7 @@ namespace MA_ETL_process
             btn_CreateConstraints_Click(sender, e);
 
             string query = "";
+            int queryMaxLength = 750000;
 
             // ---
 
@@ -196,7 +197,7 @@ namespace MA_ETL_process
             foreach (SibBW_GES_BW BW in BWs)
             {
                 query += BW.GetCypherCreate() + "\n";
-                if (query.Length > 10000000)
+                if (query.Length > queryMaxLength)
                 {
                     neo4jDriver.ExecuteCypherQuery(query);
                     query = "";
@@ -218,7 +219,7 @@ namespace MA_ETL_process
             foreach (SibBW_TEIL_BW teil_BW in teilbauwerke)
             {
                 query += teil_BW.GetCypherCreate() + "\n";
-                if (query.Length > 10000000)
+                if (query.Length > queryMaxLength)
                 {
                     neo4jDriver.ExecuteCypherQuery(query);
                     query = "";
@@ -242,7 +243,7 @@ namespace MA_ETL_process
             foreach (SibBW_PRUFALT pruefungAlt in pruefungenAlt_List)
             {
                 query += pruefungAlt.GetCypherCreate() + "\n";
-                if (query.Length > 10000000)
+                if (query.Length > queryMaxLength)
                 {
                     neo4jDriver.ExecuteCypherQuery(query);
                     query = "";
@@ -275,7 +276,7 @@ namespace MA_ETL_process
             foreach (SibBW_SCHADFALT schadAlt in schadAlt_List)
             {
                 query += schadAlt.GetCypherCreate() + "\n";
-                if (query.Length > 10000000)
+                if (query.Length > queryMaxLength)
                 {
                     neo4jDriver.ExecuteCypherQuery(query);
                     query = "";
