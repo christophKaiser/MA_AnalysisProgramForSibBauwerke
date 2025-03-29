@@ -183,6 +183,7 @@ namespace MA_ETL_process
 
             string query = "";
             int queryMaxLength = 750000;
+            List<string> queries = new List<string>();
 
             // ---
 
@@ -199,11 +200,13 @@ namespace MA_ETL_process
                 query += BW.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
+                    //neo4jDriver.ExecuteCypherQuery(query);
+                    queries.Add(query);
                     query = "";
                 }
             }
-            neo4jDriver.ExecuteCypherQuery(query);
+            //neo4jDriver.ExecuteCypherQuery(query);
+            queries.Add(query);
             query = "";
             BWs.Clear();
 
@@ -221,11 +224,13 @@ namespace MA_ETL_process
                 query += teil_BW.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
+                    //neo4jDriver.ExecuteCypherQuery(query);
+                    queries.Add(query);
                     query = "";
                 }
             }
-            neo4jDriver.ExecuteCypherQuery(query);
+            //neo4jDriver.ExecuteCypherQuery(query);
+            queries.Add(query);
             query = "";
             teilbauwerke.Clear();
 
@@ -245,11 +250,13 @@ namespace MA_ETL_process
                 query += pruefungAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
+                    //neo4jDriver.ExecuteCypherQuery(query);
+                    queries.Add(query);
                     query = "";
                 }
             }
-            neo4jDriver.ExecuteCypherQuery(query);
+            //neo4jDriver.ExecuteCypherQuery(query);
+            queries.Add(query);
             query = "";
             pruefungenAlt_List.Clear();
 
@@ -278,15 +285,21 @@ namespace MA_ETL_process
                 query += schadAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
+                    //neo4jDriver.ExecuteCypherQuery(query);
+                    queries.Add(query);
                     query = "";
                 }
             }
-            neo4jDriver.ExecuteCypherQuery(query);
+            //neo4jDriver.ExecuteCypherQuery(query);
+            queries.Add(query);
             query = "";
             schadAlt_List.Clear();
 
             // ---
+            foreach (string queryTemp in queries)
+            {
+                neo4jDriver.ExecuteCypherQuery(queryTemp);
+            }
 
             Utilities.ConsoleLog("created neo4j nodes, no relationships created");
 
