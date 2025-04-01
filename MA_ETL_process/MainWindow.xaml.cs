@@ -183,7 +183,7 @@ namespace MA_ETL_process
             btn_CreateConstraints_Click(sender, e);
 
             string query = "";
-            int queryMaxLength = 1500000;
+            int queryMaxLength = 100000;
             List<string> queries = new List<string>();
 
             // ---
@@ -239,11 +239,12 @@ namespace MA_ETL_process
 
             // ---
 
+            //all DB-entries: "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]"
             Utilities.ConsoleLog("\nPrüfungen Alt");
             List<SibBW_PRUFALT> pruefungenAlt_List = sqlClient.SelectRows<SibBW_PRUFALT>(
-                "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], " +
-                "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], " +
-                "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]" +
+                "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [AMT], [PRUFART], [PRUFJAHR], " +
+                "[PRUFDAT1], [PRUFDAT2], [ER_ZUSTAND], [ZS_MINTRAG], " +
+                "[IDENT], [MAX_S], [MAX_V], [MAX_D]" +
                 "FROM[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT]" +
                 "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT].[BWNR]" +
                 $"IN('{String.Join("', '", bridgeNumbers)}')");
@@ -269,7 +270,7 @@ namespace MA_ETL_process
             // SchadenAlt hängt an Prüfung via ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
             // aber (!!) noch keine eindeutige identifizierung des Schadens gefunden (LFDNR und SCHAD_ID sind nicht konsistent)
             // vielleicht IDENT nutzen, auch wenn Bedeutung unklar ??
-            //SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], [SCHADEN_M], [MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [UEBERBAU_M], [FELD], [FELD_M], [LAENGS], [LAENGS_M], [QUER], [QUER_M], [HOCH], [HOCH_M], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], [BEMERK2], [BEMERK2_M], [BEMERK3], [BEMERK3_M], [BEMERK4], [BEMERK4_M], [BEMERK5], [BEMERK5_M], [BEMERK6], [BEMERK6_M], [BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], [TEXT], [BILD], [KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]
+            //all DB-entries: SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], [SCHADEN_M], [MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [UEBERBAU_M], [FELD], [FELD_M], [LAENGS], [LAENGS_M], [QUER], [QUER_M], [HOCH], [HOCH_M], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], [BEMERK2], [BEMERK2_M], [BEMERK3], [BEMERK3_M], [BEMERK4], [BEMERK4_M], [BEMERK5], [BEMERK5_M], [BEMERK6], [BEMERK6_M], [BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], [TEXT], [BILD], [KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]
             //FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]
             //WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR] = 8142509;
             Utilities.ConsoleLog("\nSchäden Alt");
