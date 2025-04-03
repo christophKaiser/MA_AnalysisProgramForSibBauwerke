@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace MA_ETL_process
 {
@@ -177,11 +178,13 @@ namespace MA_ETL_process
             // bridgeNumbers.Count(): 17504
 
             // test-purpose: trim to x bridgeNumbers
-            bridgeNumbers = bridgeNumbers.GetRange(0, 50);
+            bridgeNumbers = bridgeNumbers.GetRange(0, 5);
 
             btn_CreateConstraints_Click(sender, e);
 
             string query = "";
+            int queryMaxLength = 100000;
+            List<string> queries = new List<string>();
 
             // ---
 
@@ -196,13 +199,16 @@ namespace MA_ETL_process
             foreach (SibBW_GES_BW BW in BWs)
             {
                 query += BW.GetCypherCreate() + "\n";
-                if (query.Length > 10000000)
+                if (query.Length > queryMaxLength)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
+                    //neo4jDriver.ExecuteCypherQuery(query);
+                    queries.Add(query);
                     query = "";
                 }
             }
-            neo4jDriver.ExecuteCypherQuery(query);
+            //neo4jDriver.ExecuteCypherQuery(query);
+            queries.Add(query);
+            Utilities.ConsoleLog($"sent {BWs.Count} CREATE statements in total for GES_BW");
             query = "";
             BWs.Clear();
 
@@ -218,23 +224,27 @@ namespace MA_ETL_process
             foreach (SibBW_TEIL_BW teil_BW in teilbauwerke)
             {
                 query += teil_BW.GetCypherCreate() + "\n";
-                if (query.Length > 10000000)
+                if (query.Length > queryMaxLength)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
+                    //neo4jDriver.ExecuteCypherQuery(query);
+                    queries.Add(query);
                     query = "";
                 }
             }
-            neo4jDriver.ExecuteCypherQuery(query);
+            //neo4jDriver.ExecuteCypherQuery(query);
+            queries.Add(query);
+            Utilities.ConsoleLog($"sent {teilbauwerke.Count} CREATE statements in total for TEIL_BW");
             query = "";
             teilbauwerke.Clear();
 
             // ---
 
+            //all DB-entries: "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]"
             Utilities.ConsoleLog("\nPrüfungen Alt");
             List<SibBW_PRUFALT> pruefungenAlt_List = sqlClient.SelectRows<SibBW_PRUFALT>(
-                "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], " +
-                "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], " +
-                "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]" +
+                "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [AMT], [PRUFART], [PRUFJAHR], " +
+                "[PRUFDAT1], [PRUFDAT2], [ER_ZUSTAND], [ZS_MINTRAG], " +
+                "[IDENT], [MAX_S], [MAX_V], [MAX_D]" +
                 "FROM[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT]" +
                 "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT].[BWNR]" +
                 $"IN('{String.Join("', '", bridgeNumbers)}')");
@@ -242,13 +252,16 @@ namespace MA_ETL_process
             foreach (SibBW_PRUFALT pruefungAlt in pruefungenAlt_List)
             {
                 query += pruefungAlt.GetCypherCreate() + "\n";
-                if (query.Length > 10000000)
+                if (query.Length > queryMaxLength)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
+                    //neo4jDriver.ExecuteCypherQuery(query);
+                    queries.Add(query);
                     query = "";
                 }
             }
-            neo4jDriver.ExecuteCypherQuery(query);
+            //neo4jDriver.ExecuteCypherQuery(query);
+            queries.Add(query);
+            Utilities.ConsoleLog($"sent {pruefungenAlt_List.Count} CREATE statements in total for PRUFALT");
             query = "";
             pruefungenAlt_List.Clear();
 
@@ -257,16 +270,15 @@ namespace MA_ETL_process
             // SchadenAlt hängt an Prüfung via ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
             // aber (!!) noch keine eindeutige identifizierung des Schadens gefunden (LFDNR und SCHAD_ID sind nicht konsistent)
             // vielleicht IDENT nutzen, auch wenn Bedeutung unklar ??
-            //SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], [SCHADEN_M], [MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [UEBERBAU_M], [FELD], [FELD_M], [LAENGS], [LAENGS_M], [QUER], [QUER_M], [HOCH], [HOCH_M], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], [BEMERK2], [BEMERK2_M], [BEMERK3], [BEMERK3_M], [BEMERK4], [BEMERK4_M], [BEMERK5], [BEMERK5_M], [BEMERK6], [BEMERK6_M], [BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], [TEXT], [BILD], [KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]
+            //all DB-entries: SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], [SCHADEN_M], [MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [UEBERBAU_M], [FELD], [FELD_M], [LAENGS], [LAENGS_M], [QUER], [QUER_M], [HOCH], [HOCH_M], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], [BEMERK2], [BEMERK2_M], [BEMERK3], [BEMERK3_M], [BEMERK4], [BEMERK4_M], [BEMERK5], [BEMERK5_M], [BEMERK6], [BEMERK6_M], [BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], [TEXT], [BILD], [KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]
             //FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]
             //WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR] = 8142509;
             Utilities.ConsoleLog("\nSchäden Alt");
             List<SibBW_SCHADFALT> schadAlt_List = sqlClient.SelectRows<SibBW_SCHADFALT>(
-                "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], [SCHADEN_M], " +
-                "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [UEBERBAU_M], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
-                "[QUER], [QUER_M], [HOCH], [HOCH_M], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
-                "[BEMERK2], [BEMERK2_M], [BEMERK3], [BEMERK3_M], [BEMERK4], [BEMERK4_M], [BEMERK5], [BEMERK5_M], " +
-                "[BEMERK6], [BEMERK6_M], [BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], [TEXT], [BILD], " +
+                "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], " +
+                "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
+                "[QUER], [QUER_M], [HOCH], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
+                "[BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], " +
                 "[KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]" +
                 "FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]" +
                 "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR]" +
@@ -275,19 +287,28 @@ namespace MA_ETL_process
             foreach (SibBW_SCHADFALT schadAlt in schadAlt_List)
             {
                 query += schadAlt.GetCypherCreate() + "\n";
-                if (query.Length > 10000000)
+                if (query.Length > queryMaxLength)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
+                    //neo4jDriver.ExecuteCypherQuery(query);
+                    queries.Add(query);
                     query = "";
                 }
             }
-            neo4jDriver.ExecuteCypherQuery(query);
+            //neo4jDriver.ExecuteCypherQuery(query);
+            queries.Add(query);
+            Utilities.ConsoleLog($"sent {schadAlt_List.Count} CREATE statements in total for SCHADFALT");
             query = "";
             schadAlt_List.Clear();
 
             // ---
+            Stopwatch sw = Stopwatch.StartNew();
+            foreach (string queryTemp in queries)
+            {
+                neo4jDriver.ExecuteCypherQuery(queryTemp);
+            }
+            sw.Stop();
 
-            Utilities.ConsoleLog("created neo4j nodes, no relationships created");
+            Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
 
             Utilities.ConsoleLog("'Create all bridges' finished");
         }
@@ -299,6 +320,8 @@ namespace MA_ETL_process
                 Utilities.ConsoleLog("no Neo4j connection");
                 return;
             }
+
+            Stopwatch sw = Stopwatch.StartNew();
 
             var x = neo4jDriver.ExecuteCypherQuery(
                 "MATCH (bw:GES_BW)\r\n" +
@@ -323,6 +346,9 @@ namespace MA_ETL_process
                 "RETURN count(r)").ToList();
 
             Utilities.ConsoleLog($"relationships created, there are {z[0]["count(r)"]} relationships fitting the pattern");
+
+            sw.Stop();
+            Utilities.ConsoleLog($"all relationships created in time {sw.Elapsed}");
         }
 
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)

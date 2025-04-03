@@ -23,7 +23,7 @@ namespace MA_ETL_process
         {
             // CREATE (a:Person {name:'Brie Larson', born:1989})
             // initialize CREATE
-            string cypher = $"CREATE ({cypherIdentifier}:{lable} {{";
+            string cypher = $"CREATE (:{lable} {{";
 
             // add identifier as required property
             cypher += $"identifier:'{cypherIdentifier}', ";
