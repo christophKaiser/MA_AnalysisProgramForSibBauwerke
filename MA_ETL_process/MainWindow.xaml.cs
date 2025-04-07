@@ -185,6 +185,7 @@ namespace MA_ETL_process
             string query = "";
             int queryMaxLength = 100000;
             List<string> queries = new List<string>();
+            Stopwatch sw = Stopwatch.StartNew();
 
             // ---
 
@@ -301,13 +302,12 @@ namespace MA_ETL_process
             schadAlt_List.Clear();
 
             // ---
-            Stopwatch sw = Stopwatch.StartNew();
             foreach (string queryTemp in queries)
             {
                 neo4jDriver.ExecuteCypherQuery(queryTemp);
             }
-            sw.Stop();
 
+            sw.Stop();
             Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
 
             Utilities.ConsoleLog("'Create all bridges' finished");
