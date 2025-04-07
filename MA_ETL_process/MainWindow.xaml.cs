@@ -268,29 +268,34 @@ namespace MA_ETL_process
             //FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]
             //WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR] = 8142509;
             Utilities.ConsoleLog("\nSchäden Alt");
-            List<SibBW_SCHADFALT> schadAlt_List = sqlClient.SelectRows<SibBW_SCHADFALT>(
-                "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], " +
-                "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
-                "[QUER], [QUER_M], [HOCH], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
-                "[BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], " +
-                "[KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]" +
-                "FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]" +
-                "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR]" +
-                $"IN('{String.Join("', '", bridgeNumbers)}')");
-
-            foreach (SibBW_SCHADFALT schadAlt in schadAlt_List)
+            int nSchadAlt = 0;
+            foreach (string bridgeNumber in bridgeNumbers)
             {
-                query += schadAlt.GetCypherCreate() + "\n";
-                if (query.Length > queryMaxLength)
+                List<SibBW_SCHADFALT> schadAlt_List = sqlClient.SelectRows<SibBW_SCHADFALT>(
+                    "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], " +
+                    "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
+                    "[QUER], [QUER_M], [HOCH], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
+                    "[BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], " +
+                    "[KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]" +
+                    "FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]" +
+                    "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR]" +
+                    $"IN('{String.Join("', '", bridgeNumber)}')");
+
+                foreach (SibBW_SCHADFALT schadAlt in schadAlt_List)
                 {
-                    neo4jDriver.ExecuteCypherQuery(query);
-                    query = "";
+                    query += schadAlt.GetCypherCreate() + "\n";
+                    if (query.Length > queryMaxLength)
+                    {
+                        neo4jDriver.ExecuteCypherQuery(query);
+                        query = "";
+                    }
                 }
+                neo4jDriver.ExecuteCypherQuery(query);
+                query = "";
+                nSchadAlt += schadAlt_List.Count;
+                schadAlt_List.Clear();
             }
-            neo4jDriver.ExecuteCypherQuery(query);
-            Utilities.ConsoleLog($"sent {schadAlt_List.Count} CREATE statements in total for SCHADFALT");
-            query = "";
-            schadAlt_List.Clear();
+            Utilities.ConsoleLog($"sent {nSchadAlt} CREATE statements in total for SCHADFALT");
 
             // ---
 
