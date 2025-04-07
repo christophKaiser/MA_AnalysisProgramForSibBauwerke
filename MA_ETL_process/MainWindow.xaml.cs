@@ -184,7 +184,6 @@ namespace MA_ETL_process
 
             string query = "";
             int queryMaxLength = 100000;
-            List<string> queries = new List<string>();
             Stopwatch sw = Stopwatch.StartNew();
 
             // ---
@@ -202,13 +201,11 @@ namespace MA_ETL_process
                 query += BW.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    //neo4jDriver.ExecuteCypherQuery(query);
-                    queries.Add(query);
+                    neo4jDriver.ExecuteCypherQuery(query);
                     query = "";
                 }
             }
-            //neo4jDriver.ExecuteCypherQuery(query);
-            queries.Add(query);
+            neo4jDriver.ExecuteCypherQuery(query);
             Utilities.ConsoleLog($"sent {BWs.Count} CREATE statements in total for GES_BW");
             query = "";
             BWs.Clear();
@@ -227,13 +224,11 @@ namespace MA_ETL_process
                 query += teil_BW.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    //neo4jDriver.ExecuteCypherQuery(query);
-                    queries.Add(query);
+                    neo4jDriver.ExecuteCypherQuery(query);
                     query = "";
                 }
             }
-            //neo4jDriver.ExecuteCypherQuery(query);
-            queries.Add(query);
+            neo4jDriver.ExecuteCypherQuery(query);
             Utilities.ConsoleLog($"sent {teilbauwerke.Count} CREATE statements in total for TEIL_BW");
             query = "";
             teilbauwerke.Clear();
@@ -255,13 +250,11 @@ namespace MA_ETL_process
                 query += pruefungAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    //neo4jDriver.ExecuteCypherQuery(query);
-                    queries.Add(query);
+                    neo4jDriver.ExecuteCypherQuery(query);
                     query = "";
                 }
             }
-            //neo4jDriver.ExecuteCypherQuery(query);
-            queries.Add(query);
+            neo4jDriver.ExecuteCypherQuery(query);
             Utilities.ConsoleLog($"sent {pruefungenAlt_List.Count} CREATE statements in total for PRUFALT");
             query = "";
             pruefungenAlt_List.Clear();
@@ -290,22 +283,16 @@ namespace MA_ETL_process
                 query += schadAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    //neo4jDriver.ExecuteCypherQuery(query);
-                    queries.Add(query);
+                    neo4jDriver.ExecuteCypherQuery(query);
                     query = "";
                 }
             }
-            //neo4jDriver.ExecuteCypherQuery(query);
-            queries.Add(query);
+            neo4jDriver.ExecuteCypherQuery(query);
             Utilities.ConsoleLog($"sent {schadAlt_List.Count} CREATE statements in total for SCHADFALT");
             query = "";
             schadAlt_List.Clear();
 
             // ---
-            foreach (string queryTemp in queries)
-            {
-                neo4jDriver.ExecuteCypherQuery(queryTemp);
-            }
 
             sw.Stop();
             Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
