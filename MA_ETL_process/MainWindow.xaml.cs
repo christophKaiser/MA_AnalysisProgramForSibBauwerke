@@ -177,7 +177,7 @@ namespace MA_ETL_process
             bridgeNumbers = bridgeNumbers.Distinct().ToList();
             // bridgeNumbers.Count(): 17504
 
-            // test-purpose: trim to x bridgeNumbers
+            // test-purpose: starting at <index>, take <count> bridges with GetRange(<index>, <count>)
             bridgeNumbers = bridgeNumbers.GetRange(0, 5);
 
             btn_CreateConstraints_Click(sender, e);
