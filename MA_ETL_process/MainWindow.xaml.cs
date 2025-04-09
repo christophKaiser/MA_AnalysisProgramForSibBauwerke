@@ -66,13 +66,13 @@ namespace MA_ETL_process
         private void btn_Neo4jConnection_Click(object sender, RoutedEventArgs e)
         {
             // start neo4j server
-            //System.Diagnostics.Process.Start(@"D:\\Christoph\\.Neo4jDesktop\\relate-data\\dbmss\\dbms-bd74cc49-cd57-461f-896f-a5a17a27ca1c\\bin\\neo4j.bat", "start").WaitForExit();
+            //System.Diagnostics.Process.Start(LoginCredentials.Neo4jBatFilePath, "start").WaitForExit();
 
             // creating a new driver to Neo4j, the server (DBMS) must be started inside Neo4j Desktop beforehand manually
             neo4jDriver = new Neo4jDriver();
 
             // stop neo4j server
-            //System.Diagnostics.Process.Start(@"D:\\Christoph\\.Neo4jDesktop\\relate-data\\dbmss\\dbms-bd74cc49-cd57-461f-896f-a5a17a27ca1c\\bin\\neo4j.bat", "stop").WaitForExit();
+            //System.Diagnostics.Process.Start(LoginCredentials.Neo4jBatFilePath, "stop").WaitForExit();
         }
 
         private void btn_Neo4jTest_Click(object sender, RoutedEventArgs e)
