@@ -18,6 +18,10 @@ namespace MA_ETL_process
             _connection.Open();
             Utilities.ConsoleLog("Connection to SQL Server successfully");
             // ToDo: was it realy successful?
+
+            // example to test the dispatcher
+            Thread.Sleep(5000);
+            Utilities.ConsoleLog("awaiked");
         }
 
         public List<T> SelectRows<T>(string commandText) where T : SibBw, new()

@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace MA_ETL_process
 {
@@ -30,8 +31,12 @@ namespace MA_ETL_process
 
         private void btn_SqlConnection_Click(object sender, RoutedEventArgs e)
         {
-            // create and open a new connection to the SQL Server
-            sqlClient = new SqlClient();
+            // start new thread beside the UI-thread (which the button would use)
+            Task.Run(() =>
+            {
+                // create and open a new connection to the SQL Server
+                sqlClient = new SqlClient();
+            });
         }
 
         private void btn_Neo4jConnection_Click(object sender, RoutedEventArgs e)
