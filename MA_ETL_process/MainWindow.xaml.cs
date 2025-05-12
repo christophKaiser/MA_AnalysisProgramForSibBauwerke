@@ -29,6 +29,14 @@ namespace MA_ETL_process
             Utilities.ConsoleLog("Click a button");
         }
 
+        private void buttonsAreEnabled(bool stage)
+        {
+            foreach (Button button in buttonsList(mainWindow))
+            {
+                button.IsEnabled = stage;
+            }
+        }
+
         private void btn_SqlConnection_Click(object sender, RoutedEventArgs e)
         {
             // create and open a new connection to the SQL Server
@@ -73,8 +81,10 @@ namespace MA_ETL_process
             Utilities.ConsoleLog("created constriants");
         }
 
-        private void btn_CreateAllBridges_Click(object sender, RoutedEventArgs e)
+        private async void btn_CreateAllBridges_Click(object sender, RoutedEventArgs e)
         {
+            buttonsAreEnabled(false);
+
             if (sqlClient == null)
             {
                 Utilities.ConsoleLog("no SQL connection");
@@ -102,7 +112,7 @@ namespace MA_ETL_process
             int queryMaxLength = 100000;
 
             // start new thread beside the UI-thread (which the button would use)
-            Task.Run(() =>
+            Task task = Task.Run(() =>
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
@@ -206,6 +216,7 @@ namespace MA_ETL_process
                     SendCypherQuery(ref query);
                     nSchadAlt += schadAlt_List.Count;
                     schadAlt_List.Clear();
+                    Utilities.ConsoleLog($"sent Schäden for bridge no. {bridgeNumber}");
                 }
                 Utilities.ConsoleLog($"sent {nSchadAlt} CREATE statements in total for SCHADFALT");
 
@@ -213,9 +224,12 @@ namespace MA_ETL_process
 
                 sw.Stop();
                 Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
+
+                Utilities.ConsoleLog("'Create all bridges' finished");
             });
 
-            Utilities.ConsoleLog("'Create all bridges' finished");
+            await task;
+            buttonsAreEnabled(true);
         }
 
         private void SendCypherQuery(ref string query)
@@ -227,8 +241,10 @@ namespace MA_ETL_process
             }
         }
 
-        private void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)
+        private async void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)
         {
+            buttonsAreEnabled(false);
+
             if (neo4jDriver == null)
             {
                 Utilities.ConsoleLog("no Neo4j connection");
@@ -236,7 +252,7 @@ namespace MA_ETL_process
             }
 
             // start new thread beside the UI-thread (which the button would use)
-            Task.Run(() =>
+            Task task = Task.Run(() =>
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
@@ -268,6 +284,9 @@ namespace MA_ETL_process
             
                 Utilities.ConsoleLog($"all relationships created in time {sw.Elapsed}");
             });
+
+            await task;
+            buttonsAreEnabled(true);
         }
 
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
@@ -290,6 +309,30 @@ namespace MA_ETL_process
             }
 
             neo4jDriver.DeleteAllConstraintsInDatabase();
+        }
+
+        private static IEnumerable<Button> buttonsList(DependencyObject element)
+        {
+            if (element != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(element); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(element, i);
+
+                    if (child != null)
+                    {
+                        if (child is Button)
+                        {
+                            yield return (Button)child;
+                        }
+
+                        foreach (Button childOfChild in buttonsList(child))
+                        {
+                            yield return childOfChild;
+                        }
+                    }
+                }
+            }
         }
     }
 }
