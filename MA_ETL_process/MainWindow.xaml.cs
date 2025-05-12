@@ -66,13 +66,13 @@ namespace MA_ETL_process
         private void btn_Neo4jConnection_Click(object sender, RoutedEventArgs e)
         {
             // start neo4j server
-            //System.Diagnostics.Process.Start(@"D:\\Christoph\\.Neo4jDesktop\\relate-data\\dbmss\\dbms-bd74cc49-cd57-461f-896f-a5a17a27ca1c\\bin\\neo4j.bat", "start").WaitForExit();
+            //System.Diagnostics.Process.Start(LoginCredentials.Neo4jBatFilePath, "start").WaitForExit();
 
             // creating a new driver to Neo4j, the server (DBMS) must be started inside Neo4j Desktop beforehand manually
             neo4jDriver = new Neo4jDriver();
 
             // stop neo4j server
-            //System.Diagnostics.Process.Start(@"D:\\Christoph\\.Neo4jDesktop\\relate-data\\dbmss\\dbms-bd74cc49-cd57-461f-896f-a5a17a27ca1c\\bin\\neo4j.bat", "stop").WaitForExit();
+            //System.Diagnostics.Process.Start(LoginCredentials.Neo4jBatFilePath, "stop").WaitForExit();
         }
 
         private void btn_Neo4jTest_Click(object sender, RoutedEventArgs e)
@@ -177,14 +177,14 @@ namespace MA_ETL_process
             bridgeNumbers = bridgeNumbers.Distinct().ToList();
             // bridgeNumbers.Count(): 17504
 
-            // test-purpose: trim to x bridgeNumbers
+            // test-purpose: starting at <index>, take <count> bridges with GetRange(<index>, <count>)
             bridgeNumbers = bridgeNumbers.GetRange(0, 5);
 
             btn_CreateConstraints_Click(sender, e);
 
             string query = "";
             int queryMaxLength = 100000;
-            List<string> queries = new List<string>();
+            Stopwatch sw = Stopwatch.StartNew();
 
             // ---
 
@@ -201,15 +201,11 @@ namespace MA_ETL_process
                 query += BW.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    //neo4jDriver.ExecuteCypherQuery(query);
-                    queries.Add(query);
-                    query = "";
+                    SendCypherQuery(ref query);
                 }
             }
-            //neo4jDriver.ExecuteCypherQuery(query);
-            queries.Add(query);
+            SendCypherQuery(ref query);
             Utilities.ConsoleLog($"sent {BWs.Count} CREATE statements in total for GES_BW");
-            query = "";
             BWs.Clear();
 
             // ---
@@ -226,15 +222,11 @@ namespace MA_ETL_process
                 query += teil_BW.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    //neo4jDriver.ExecuteCypherQuery(query);
-                    queries.Add(query);
-                    query = "";
+                    SendCypherQuery(ref query);
                 }
             }
-            //neo4jDriver.ExecuteCypherQuery(query);
-            queries.Add(query);
+            SendCypherQuery(ref query);
             Utilities.ConsoleLog($"sent {teilbauwerke.Count} CREATE statements in total for TEIL_BW");
-            query = "";
             teilbauwerke.Clear();
 
             // ---
@@ -254,15 +246,11 @@ namespace MA_ETL_process
                 query += pruefungAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    //neo4jDriver.ExecuteCypherQuery(query);
-                    queries.Add(query);
-                    query = "";
+                    SendCypherQuery(ref query);
                 }
             }
-            //neo4jDriver.ExecuteCypherQuery(query);
-            queries.Add(query);
+            SendCypherQuery(ref query);
             Utilities.ConsoleLog($"sent {pruefungenAlt_List.Count} CREATE statements in total for PRUFALT");
-            query = "";
             pruefungenAlt_List.Clear();
 
             // ---
@@ -274,43 +262,48 @@ namespace MA_ETL_process
             //FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]
             //WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR] = 8142509;
             Utilities.ConsoleLog("\nSchäden Alt");
-            List<SibBW_SCHADFALT> schadAlt_List = sqlClient.SelectRows<SibBW_SCHADFALT>(
-                "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], " +
-                "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
-                "[QUER], [QUER_M], [HOCH], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
-                "[BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], " +
-                "[KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]" +
-                "FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]" +
-                "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR]" +
-                $"IN('{String.Join("', '", bridgeNumbers)}')");
-
-            foreach (SibBW_SCHADFALT schadAlt in schadAlt_List)
+            int nSchadAlt = 0;
+            foreach (string bridgeNumber in bridgeNumbers)
             {
-                query += schadAlt.GetCypherCreate() + "\n";
-                if (query.Length > queryMaxLength)
+                List<SibBW_SCHADFALT> schadAlt_List = sqlClient.SelectRows<SibBW_SCHADFALT>(
+                    "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], " +
+                    "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
+                    "[QUER], [QUER_M], [HOCH], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
+                    "[BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], " +
+                    "[KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]" +
+                    "FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]" +
+                    "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR]" +
+                    $"IN('{String.Join("', '", bridgeNumber)}')");
+
+                foreach (SibBW_SCHADFALT schadAlt in schadAlt_List)
                 {
-                    //neo4jDriver.ExecuteCypherQuery(query);
-                    queries.Add(query);
-                    query = "";
+                    query += schadAlt.GetCypherCreate() + "\n";
+                    if (query.Length > queryMaxLength)
+                    {
+                        SendCypherQuery(ref query);
+                    }
                 }
+                SendCypherQuery(ref query);
+                nSchadAlt += schadAlt_List.Count;
+                schadAlt_List.Clear();
             }
-            //neo4jDriver.ExecuteCypherQuery(query);
-            queries.Add(query);
-            Utilities.ConsoleLog($"sent {schadAlt_List.Count} CREATE statements in total for SCHADFALT");
-            query = "";
-            schadAlt_List.Clear();
+            Utilities.ConsoleLog($"sent {nSchadAlt} CREATE statements in total for SCHADFALT");
 
             // ---
-            Stopwatch sw = Stopwatch.StartNew();
-            foreach (string queryTemp in queries)
-            {
-                neo4jDriver.ExecuteCypherQuery(queryTemp);
-            }
-            sw.Stop();
 
+            sw.Stop();
             Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
 
             Utilities.ConsoleLog("'Create all bridges' finished");
+        }
+
+        private void SendCypherQuery(ref string query)
+        {
+            if (query != "" && neo4jDriver != null)
+            {
+                neo4jDriver.ExecuteCypherQuery(query);
+                query = "";
+            }
         }
 
         private void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)

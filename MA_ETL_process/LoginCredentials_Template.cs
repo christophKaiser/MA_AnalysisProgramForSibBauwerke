@@ -14,6 +14,10 @@ namespace MA_ETL_process
             "Data Source=<addressToServer>;Initial Catalog=<nameOfDatabase>;" +
             "Integrated Security=True;Encrypt=False;Trust Server Certificate=True";
 
+        // Path where the DBMS is stored which can be obtained in neo4j Desktop on the DBMS > Settings > Open folder > DBMS,
+        // check / adjust the drive too - "C:" is just for illustration here
+        public static string Neo4jBatFilePath = @"C:\\<DBMS-path>\\bin\\neo4j.bat";
+
         public static string Neo4jUri = "bolt://localhost:<9999>";
         public static string Neo4jUser = "<user>";
         public static string Neo4jPassword = "<password>";
