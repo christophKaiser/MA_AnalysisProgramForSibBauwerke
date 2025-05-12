@@ -20,41 +20,6 @@ namespace MA_ETL_process
             // ToDo: was it realy successful?
         }
 
-        public void SelectTestRows()
-        {
-            string commandText = @"SELECT TOP (10) * FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]";
-            SelectRows(commandText);
-        }
-
-        public void SelectRows(string commandText)
-        {
-            using (var command = new SqlC.SqlCommand())
-            {
-                command.Connection = _connection;
-                command.CommandType = CommandType.Text;
-                command.CommandText = commandText;
-
-                SqlC.SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    string line = "";
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        //line += reader.GetName(i) + ": " + reader.GetValue(i) + "   ";  // maybe a bit slower
-                        line += reader.GetName(i) + ": " + reader[i] + "   ";  // maybe a bit faster
-
-                        // string reader[i].GetDataTypeName()  // fast
-                        // Type reader[i].GetType() // slower than GetDataTypeName()
-                        //                             ... at least on Debug-Console with text output in console
-                    }
-                    Utilities.ConsoleLog(line);
-                }
-
-                reader.Close();
-            }
-        }
-
         public List<T> SelectRows<T>(string commandText) where T : SibBw, new()
         {
             List<T> sibBws = new List<T>();

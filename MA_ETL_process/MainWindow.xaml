@@ -19,8 +19,6 @@
             <WrapPanel>
                 <Button x:Name="btn_SqlConnection" Content="Open SQL Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_SqlConnection_Click"/>
-                <Button x:Name="btn_SqlTest" Content="Test SQL Connection"
-                    Style="{StaticResource ButtonStyle}" Click="btn_SqlTest_Click"/>
             </WrapPanel>
             <WrapPanel>
                 <Button x:Name="btn_Neo4jConnection" Content="Open Neo4j Connection"
