@@ -46,18 +46,6 @@ namespace MA_ETL_process
             //System.Diagnostics.Process.Start(LoginCredentials.Neo4jBatFilePath, "stop").WaitForExit();
         }
 
-        private void btn_Neo4jTest_Click(object sender, RoutedEventArgs e)
-        {
-            if (neo4jDriver == null)
-            {
-                Utilities.ConsoleLog("no Neo4j connection");
-                return;
-            }
-
-            // call test function which creates a node in the Neo4j database
-            neo4jDriver.PrintGreeting("hello world", 42, "42");
-        }
-
         private void btn_CreateConstraints_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)
