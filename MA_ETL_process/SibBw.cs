@@ -70,17 +70,6 @@ namespace MA_ETL_process
         {
             return GetCypherCreate(identifier, label);
         }
-
-        public string GetCypherCreateMerge_BW_TeilBWs()
-        {
-            string cypher = GetCypherCreate();
-            foreach (SibBW_TEIL_BW teilBW in teilbauwerke)
-            {
-                cypher += "\n" + teilBW.GetCypherCreate();
-                cypher += "\n" + GetCypherMerge(identifier, teilBW.identifier, "BW_TeilBW");
-            }
-            return cypher;
-        }
     }
 
     internal class SibBW_TEIL_BW : SibBw
