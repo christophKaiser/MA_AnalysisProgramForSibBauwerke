@@ -19,10 +19,10 @@
             <WrapPanel>
                 <Button x:Name="btn_SqlConnection" Content="Open SQL Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_SqlConnection_Click"/>
-            </WrapPanel>
-            <WrapPanel>
                 <Button x:Name="btn_Neo4jConnection" Content="Open Neo4j Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jConnection_Click"/>
+            </WrapPanel>
+            <WrapPanel>
                 <Button x:Name="btn_Neo4jDeleteNodes" Content="Delete Nodes in Neo4j DB"
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteNodes_Click"/>
                 <Button x:Name="btn_Neo4jDeleteConstraints" Content="Delete Constraints in Neo4j DB"
