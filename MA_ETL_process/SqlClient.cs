@@ -42,7 +42,17 @@ namespace MA_ETL_process
                         //line += reader.GetName(i) + ": " + reader.GetValue(i) + "   ";  // maybe a bit slower
                         line += reader.GetName(i) + ": " + reader[i] + "   ";  // maybe a bit faster
 
-                        sibBw.stringValues.Add(reader.GetName(i), reader[i].ToString());
+                        string type = reader.GetDataTypeName(i);
+                        switch (type)
+                        {
+                            case "char":
+                            case "varchar":
+                            default: // not handled above (default) is same as string
+                                // add to stringValues: use fild name by GetName(i);
+                                // null-check 'reader[i].ToString()' by '??', if null then use empty string ""
+                                sibBw.stringValues.Add(reader.GetName(i), reader[i].ToString() ?? "");
+                                break;
+                        }
 
                         // string reader[i].GetDataTypeName()  // fast
                         // Type reader[i].GetType() // slower than GetDataTypeName()
