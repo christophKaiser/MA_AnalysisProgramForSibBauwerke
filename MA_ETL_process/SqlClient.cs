@@ -36,17 +36,26 @@ namespace MA_ETL_process
                 {
                     T sibBw = new T();
 
-                    string line = "";
+                    //string line = "";
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
                         //line += reader.GetName(i) + ": " + reader.GetValue(i) + "   ";  // maybe a bit slower
-                        line += reader.GetName(i) + ": " + reader[i] + "   ";  // maybe a bit faster
+                        //line += reader.GetName(i) + ": " + reader[i] + "   ";  // maybe a bit faster
 
                         string type = reader.GetDataTypeName(i);
                         switch (type)
                         {
+                            case "decimal":
+                                // get value from reader, convert to string, check if null then use "" (?? is null-coalescing operator)
+                                string value = reader[i].ToString() ?? "";
+                                // add key-value-pair: use "-1" if value is empty (conditional operator),
+                                // replace decimal separator "," by "." (by default, the thousend separator doesn't occure in ToString())
+                                sibBw.numberValues.Add(reader.GetName(i),  ((value != "") ? value : "-1").Replace(",","."));
+                                break;
                             case "char":
                             case "varchar":
+                                sibBw.stringValues.Add(reader.GetName(i), reader[i].ToString() ?? ""); // temp line
+                                break; // temp line
                             default: // not handled above (default) is same as string
                                 // add to stringValues: use fild name by GetName(i);
                                 // null-check 'reader[i].ToString()' by '??', if null then use empty string ""
@@ -83,7 +92,7 @@ namespace MA_ETL_process
 
                 while (reader.Read())
                 {
-                    result.Add(reader.GetValue(0).ToString());
+                    result.Add(reader.GetValue(0).ToString() ?? "");
                 }
 
                 reader.Close();

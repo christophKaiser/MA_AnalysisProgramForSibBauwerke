@@ -9,7 +9,7 @@ namespace MA_ETL_process
     internal class SibBw
     {
         public Dictionary<string, string> stringValues = new Dictionary<string, string>();
-        public Dictionary<string, double> numberValues = new Dictionary<string, double>();
+        public Dictionary<string, string> numberValues = new Dictionary<string, string>();
 
         public string GetCypherConstraintKey(string label)
         {
@@ -34,7 +34,7 @@ namespace MA_ETL_process
             }
 
             // add numberValues as properties
-            foreach (KeyValuePair<string, double> kvp in numberValues)
+            foreach (KeyValuePair<string, string> kvp in numberValues)
             {
                 cypher += $"{kvp.Key}:{kvp.Value}, ";
             }
@@ -88,7 +88,7 @@ namespace MA_ETL_process
     internal class SibBW_PRUFALT : SibBw
     {
         public string identifier { get { return ("ID_NR" + stringValues["ID_NR"] + 
-                    "_" + stringValues["PRUFJAHR"] + "_" + stringValues["PRUFART"]).Replace(" ", "_"); } }
+                    "_" + numberValues["PRUFJAHR"] + "_" + stringValues["PRUFART"]).Replace(" ", "_"); } }
         public string label = "PRUFALT";
 
         public string GetCypherCreate()
@@ -101,7 +101,7 @@ namespace MA_ETL_process
     {
         public string identifier { get {
                 // ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
-                return ("ID_NR" + stringValues["ID_NR"] + "_" + stringValues["PRUFJAHR"] 
+                return ("ID_NR" + stringValues["ID_NR"] + "_" + numberValues["PRUFJAHR"] 
                     + "_" + stringValues["PRA"] + "_" + stringValues["IDENT"]).Replace(" ", "_");
             }
         }
@@ -111,7 +111,7 @@ namespace MA_ETL_process
             {
                 // ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
                 return ("ID_NR" + stringValues["ID_NR"].Replace(" ", "_") +
-                    "_" + stringValues["PRUFJAHR"] + "_" + stringValues["PRA"]).Replace(" ", "_");
+                    "_" + numberValues["PRUFJAHR"] + "_" + stringValues["PRA"]).Replace(" ", "_");
             }
         }
         public string label = "SCHADALT";
