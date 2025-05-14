@@ -64,7 +64,7 @@ namespace MA_ETL_process
                                 break; // temp line
                             default: // not handled above (default) is same as string
                                 // add to stringValues: use fild name by GetName(i);
-                                // null-check 'reader[i].ToString()' by '??', if null then use empty string ""
+                                // null-check 'reader[i].ToString()' by '??' (null-coalescing operator), if null then use empty string ""
                                 sibBw.stringValues.Add(reader.GetName(i), reader[i].ToString() ?? "");
                                 break;
                         }
