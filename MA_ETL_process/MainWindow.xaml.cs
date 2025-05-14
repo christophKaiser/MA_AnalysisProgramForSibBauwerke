@@ -57,8 +57,6 @@ namespace MA_ETL_process
 
         private async void btn_CreateAllBridges_Click(object sender, RoutedEventArgs e)
         {
-            buttonsAreEnabled(false);
-
             if (sqlClient == null)
             {
                 Utilities.ConsoleLog("no SQL connection");
@@ -69,6 +67,8 @@ namespace MA_ETL_process
                 Utilities.ConsoleLog("no Neo4j connection");
                 return;
             }
+
+            buttonsAreEnabled(false);
 
             List<string> bridgeNumbers = sqlClient.SelectRowsOneColumn("BRUECKE", "BWNR");
             // bridgeNumbers.Count(): 20349
@@ -243,13 +243,13 @@ namespace MA_ETL_process
 
         private async void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)
         {
-            buttonsAreEnabled(false);
-
             if (neo4jDriver == null)
             {
                 Utilities.ConsoleLog("no Neo4j connection");
                 return;
             }
+
+            buttonsAreEnabled(false);
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
@@ -291,13 +291,13 @@ namespace MA_ETL_process
 
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
         {
-            buttonsAreEnabled(false);
-
             if (neo4jDriver == null)
             {
                 Utilities.ConsoleLog("no Neo4j connection");
                 return;
             }
+
+            buttonsAreEnabled(false);
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
