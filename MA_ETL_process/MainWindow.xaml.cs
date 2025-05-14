@@ -57,8 +57,6 @@ namespace MA_ETL_process
 
         private async void btn_CreateAllBridges_Click(object sender, RoutedEventArgs e)
         {
-            buttonsAreEnabled(false);
-
             if (sqlClient == null)
             {
                 Utilities.ConsoleLog("no SQL connection");
@@ -69,6 +67,8 @@ namespace MA_ETL_process
                 Utilities.ConsoleLog("no Neo4j connection");
                 return;
             }
+
+            buttonsAreEnabled(false);
 
             List<string> bridgeNumbers = sqlClient.SelectRowsOneColumn("BRUECKE", "BWNR");
             // bridgeNumbers.Count(): 20349
@@ -243,13 +243,13 @@ namespace MA_ETL_process
 
         private async void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)
         {
-            buttonsAreEnabled(false);
-
             if (neo4jDriver == null)
             {
                 Utilities.ConsoleLog("no Neo4j connection");
                 return;
             }
+
+            buttonsAreEnabled(false);
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
@@ -283,6 +283,45 @@ namespace MA_ETL_process
                 sw.Stop();
             
                 Utilities.ConsoleLog($"all relationships created in time {sw.Elapsed}");
+            });
+
+            await task;
+            buttonsAreEnabled(true);
+        }
+
+        private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsAreEnabled(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (p:PRUFALT)   // get all PRUFALT\r\n" +
+                    "CALL(p) {   // execute foreach PRUFALT\r\n" +
+                    "  // get all other PRUFALT's into ps which are part of same TEIL_BW\r\n" +
+                    "  MATCH (p)<-[:teilBw_prufAlt]-(:TEIL_BW)-[:teilBw_prufAlt]->(ps:PRUFALT)\r\n" +
+                    "    // filter ps to have all PRUFALT ps being older than p\r\n" +
+                    "    WITH ps WHERE ps.PRUFDAT2 < p.PRUFDAT2\r\n" +
+                    "    // oder the list descending = youngest ps first;\r\n" +
+                    "    // only take the youngest by LIMIT 1 into ps\r\n" +
+                    "    ORDER BY ps.PRUFDAT2 DESC LIMIT 1\r\n" +
+                    "  MERGE (p)-[:hat_vorherige_prufAlt]->(ps)\r\n" +
+                    "  //RETURN collect([p, ps]) as psCollection\r\n" +
+                    "}\r\n" +
+                    "//RETURN psCollection\r\n");
+
+                var x = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH r=(:PRUFALT)-[:hat_vorherige_prufAlt]->(:PRUFALT)\r\n" +
+                    "RETURN DISTINCT count(r)").ToList();
+
+                Utilities.ConsoleLog($"created {x[0]["count(r)"]} relationships ':hat_vorherige_prufAlt'");
             });
 
             await task;

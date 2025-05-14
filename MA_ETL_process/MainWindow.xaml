@@ -10,6 +10,7 @@
     <Grid x:Name="mainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="140"/>
@@ -34,8 +35,14 @@
             </WrapPanel>
         </StackPanel>
 
+        <StackPanel Grid.Column="1" Grid.Row="0">
+            <WrapPanel>
+                <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreateTimeseries_Click"/>
+            </WrapPanel>
+        </StackPanel>
 
-        <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1"
+        <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
                  Margin="0 0 0 0" Padding="4 2"
                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                  ScrollViewer.HorizontalScrollBarVisibility="Visible"
