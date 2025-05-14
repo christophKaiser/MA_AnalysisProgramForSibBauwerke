@@ -22,27 +22,6 @@ namespace MA_ETL_process
             // ToDo: was it realy successful?
         }
 
-        public void PrintGreeting(string message, int iInt, string iString)
-        {
-            // called function: Neo4j.Driver.IQueryRunner.Run(..)
-            var result = _session.Run(
-                "CREATE (a:Greeting) " +
-                //"SET a.message = $message " +
-                "SET a = {message: $message, iInt: $iInt, iString: $iString} \n" +
-                "CREATE (b:Greeting) SET b = {message: $message} \n" +
-                "RETURN a.message + ', from node ' + id(a), \n" +
-                "  b.message + ', from node ' + id(b)",
-                //new { messsage });
-                new { message, iInt, iString }).Single();
-            // test result: iInt is intager in neo4j, iString is string in neo4j
-
-            // console output of several Return / result entities
-            foreach (var item in result)
-            {
-                Utilities.ConsoleLog(item.Value.ToString());
-            }
-        }
-
         public IResult ExecuteCypherQuery(string query)
         {
             return _session.Run(query);

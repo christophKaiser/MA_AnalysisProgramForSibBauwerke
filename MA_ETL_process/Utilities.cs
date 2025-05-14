@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace MA_ETL_process
 {
@@ -16,8 +18,14 @@ namespace MA_ETL_process
         {
             if (txtConsole != null)
             {
-                txtConsole.Text += message + "\n";
-                txtConsole.ScrollToEnd();
+                // call the dispatcher
+                Application.Current.Dispatcher.Invoke(
+                    DispatcherPriority.Render,
+                    () => {
+                        // do stuff to show up in the UI
+                        txtConsole.Text += message + "\n";
+                        txtConsole.ScrollToEnd();
+                });
             }
         }
     }

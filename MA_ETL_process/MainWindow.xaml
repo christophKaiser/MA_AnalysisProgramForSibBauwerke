@@ -19,24 +19,14 @@
             <WrapPanel>
                 <Button x:Name="btn_SqlConnection" Content="Open SQL Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_SqlConnection_Click"/>
-                <Button x:Name="btn_SqlTest" Content="Test SQL Connection"
-                    Style="{StaticResource ButtonStyle}" Click="btn_SqlTest_Click"/>
-            </WrapPanel>
-            <WrapPanel>
                 <Button x:Name="btn_Neo4jConnection" Content="Open Neo4j Connection"
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jConnection_Click"/>
-                <Button x:Name="btn_Neo4jTest" Content="Test Neo4j Connection"
-                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jTest_Click"/>
-                <Button x:Name="btn_Neo4jDeleteNodes" Content="Delete Nodes in Neo4j DB"
-                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteNodes_Click"/>
-                <Button x:Name="btn_Neo4jDeleteConstraints" Content="Delete Constraints in Neo4j DB"
-                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteConstraints_Click"/>
             </WrapPanel>
             <WrapPanel>
-                <Button x:Name="btn_CreateConstraints" Content="Create constraints"
-                    Style="{StaticResource ButtonStyle}" Click="btn_CreateConstraints_Click"/>
-                <Button x:Name="btn_FirstTriple" Content="Create first triple"
-                    Style="{StaticResource ButtonStyle}" Click="btn_FirstTriple_Click"/>
+                <Button x:Name="btn_Neo4jDeleteNodes" Content="Delete Constraints &amp; Nodes in Neo4j DB"
+                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteNodes_Click"/>
+            </WrapPanel>
+            <WrapPanel>
                 <Button x:Name="btn_CreateAllBridges" Content="Create all bridges without relationships"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateAllBridges_Click"/>
                 <Button x:Name="btn_CreateRelationshipsAllBridges" Content="Create relationships between all bridges"
