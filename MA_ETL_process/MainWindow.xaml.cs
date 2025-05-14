@@ -303,19 +303,25 @@ namespace MA_ETL_process
             Task task = Task.Run(() =>
             {
                 neo4jDriver.ExecuteCypherQuery(
-                "MATCH (p:PRUFALT)   // get all PRUFALT\r\n" +
-                "CALL(p) {   // execute foreach PRUFALT\r\n" +
-                "  // get all other PRUFALT's into ps which are part of same TEIL_BW\r\n" +
-                "  MATCH (p)<-[:teilBw_prufAlt]-(:TEIL_BW)-[:teilBw_prufAlt]->(ps:PRUFALT)\r\n" +
-                "    // filter ps to have all PRUFALT ps being older than p\r\n" +
-                "    WITH ps WHERE ps.PRUFDAT2 < p.PRUFDAT2\r\n" +
-                "    // oder the list descending = youngest ps first;\r\n" +
-                "    // only take the youngest by LIMIT 1 into ps\r\n" +
-                "    ORDER BY ps.PRUFDAT2 DESC LIMIT 1\r\n" +
-                "  CREATE (p)-[:hat_vorherige_prufAlt]->(ps)\r\n" +
-                "  //RETURN collect([p, ps]) as psCollection\r\n" +
-                "}\r\n" +
-                "//RETURN psCollection");
+                    "MATCH (p:PRUFALT)   // get all PRUFALT\r\n" +
+                    "CALL(p) {   // execute foreach PRUFALT\r\n" +
+                    "  // get all other PRUFALT's into ps which are part of same TEIL_BW\r\n" +
+                    "  MATCH (p)<-[:teilBw_prufAlt]-(:TEIL_BW)-[:teilBw_prufAlt]->(ps:PRUFALT)\r\n" +
+                    "    // filter ps to have all PRUFALT ps being older than p\r\n" +
+                    "    WITH ps WHERE ps.PRUFDAT2 < p.PRUFDAT2\r\n" +
+                    "    // oder the list descending = youngest ps first;\r\n" +
+                    "    // only take the youngest by LIMIT 1 into ps\r\n" +
+                    "    ORDER BY ps.PRUFDAT2 DESC LIMIT 1\r\n" +
+                    "  MERGE (p)-[:hat_vorherige_prufAlt]->(ps)\r\n" +
+                    "  //RETURN collect([p, ps]) as psCollection\r\n" +
+                    "}\r\n" +
+                    "//RETURN psCollection\r\n");
+
+                var x = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH r=(:PRUFALT)-[:hat_vorherige_prufAlt]->(:PRUFALT)\r\n" +
+                    "RETURN DISTINCT count(r)").ToList();
+
+                Utilities.ConsoleLog($"created {x[0]["count(r)"]} relationships ':hat_vorherige_prufAlt'");
             });
 
             await task;
