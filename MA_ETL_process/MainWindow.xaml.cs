@@ -55,32 +55,6 @@ namespace MA_ETL_process
             //System.Diagnostics.Process.Start(LoginCredentials.Neo4jBatFilePath, "stop").WaitForExit();
         }
 
-        private void createConstraints()
-        {
-            if (neo4jDriver == null)
-            {
-                Utilities.ConsoleLog("no Neo4j connection");
-                return;
-            }
-
-            List<string> sibBw_labels = [];
-            sibBw_labels.Add(new SibBW_GES_BW().label);
-            sibBw_labels.Add(new SibBW_TEIL_BW().label);
-            sibBw_labels.Add(new SibBW_PRUFALT().label);
-            sibBw_labels.Add(new SibBW_SCHADFALT().label);
-
-            SibBw sibBw_dummy = new SibBw();
-            foreach (string label in sibBw_labels)
-            {
-                string cypherString = sibBw_dummy.GetCypherConstraintKey(label);
-                Utilities.ConsoleLog(cypherString);
-                neo4jDriver.ExecuteCypherQuery(cypherString);
-                // neo4j requires the "CREATE CONSTRAINTS" to be single statements in _session.Run(..)
-            }
-
-            Utilities.ConsoleLog("created constriants");
-        }
-
         private async void btn_CreateAllBridges_Click(object sender, RoutedEventArgs e)
         {
             buttonsAreEnabled(false);
@@ -230,6 +204,32 @@ namespace MA_ETL_process
 
             await task;
             buttonsAreEnabled(true);
+        }
+
+        private void createConstraints()
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            List<string> sibBw_labels = [];
+            sibBw_labels.Add(new SibBW_GES_BW().label);
+            sibBw_labels.Add(new SibBW_TEIL_BW().label);
+            sibBw_labels.Add(new SibBW_PRUFALT().label);
+            sibBw_labels.Add(new SibBW_SCHADFALT().label);
+
+            SibBw sibBw_dummy = new SibBw();
+            foreach (string label in sibBw_labels)
+            {
+                string cypherString = sibBw_dummy.GetCypherConstraintKey(label);
+                Utilities.ConsoleLog(cypherString);
+                neo4jDriver.ExecuteCypherQuery(cypherString);
+                // neo4j requires the "CREATE CONSTRAINTS" to be single statements in _session.Run(..)
+            }
+
+            Utilities.ConsoleLog("created constriants");
         }
 
         private void SendCypherQuery(ref string query)
