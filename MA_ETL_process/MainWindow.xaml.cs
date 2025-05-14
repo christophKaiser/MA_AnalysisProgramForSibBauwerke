@@ -297,18 +297,8 @@ namespace MA_ETL_process
                 return;
             }
 
-            neo4jDriver.DeleteAllNodesInDatabase();
-        }
-
-        private void btn_Neo4jDeleteConstraints_Click(object sender, RoutedEventArgs e)
-        {
-            if (neo4jDriver == null)
-            {
-                Utilities.ConsoleLog("no Neo4j connection");
-                return;
-            }
-
             neo4jDriver.DeleteAllConstraintsInDatabase();
+            neo4jDriver.DeleteAllNodesInDatabase();
         }
 
         private static IEnumerable<Button> buttonsList(DependencyObject element)

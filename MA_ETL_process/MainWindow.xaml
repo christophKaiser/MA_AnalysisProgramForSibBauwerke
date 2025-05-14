@@ -23,10 +23,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jConnection_Click"/>
             </WrapPanel>
             <WrapPanel>
-                <Button x:Name="btn_Neo4jDeleteNodes" Content="Delete Nodes in Neo4j DB"
+                <Button x:Name="btn_Neo4jDeleteNodes" Content="Delete Constraints &amp; Nodes in Neo4j DB"
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteNodes_Click"/>
-                <Button x:Name="btn_Neo4jDeleteConstraints" Content="Delete Constraints in Neo4j DB"
-                    Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteConstraints_Click"/>
             </WrapPanel>
             <WrapPanel>
                 <Button x:Name="btn_CreateAllBridges" Content="Create all bridges without relationships"
