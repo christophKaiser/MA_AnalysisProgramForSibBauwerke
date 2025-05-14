@@ -10,6 +10,7 @@ namespace MA_ETL_process
     {
         public Dictionary<string, string> stringValues = new Dictionary<string, string>();
         public Dictionary<string, string> numberValues = new Dictionary<string, string>();
+        public Dictionary<string, string> dateValues = new Dictionary<string, string>();
 
         public string GetCypherConstraintKey(string label)
         {
@@ -46,6 +47,12 @@ namespace MA_ETL_process
                 //...Replace("'", "\\'")  - adds one backslash before apostrophes inside the string
                 //                       to mark them as part of the string and not as end of string
                 //kvp.Value.TrimEnd() // removes all whitespaces at the end of the string
+            }
+
+            // add dateValues as properties
+            foreach (KeyValuePair<string, string> kvp in dateValues)
+            {
+                cypher += $"{kvp.Key}:localdatetime('{kvp.Value}'), ";
             }
 
             // remove last ", " in the cypher-string

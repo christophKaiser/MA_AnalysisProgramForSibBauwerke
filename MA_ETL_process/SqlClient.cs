@@ -42,15 +42,21 @@ namespace MA_ETL_process
                         //line += reader.GetName(i) + ": " + reader.GetValue(i) + "   ";  // maybe a bit slower
                         //line += reader.GetName(i) + ": " + reader[i] + "   ";  // maybe a bit faster
 
+                        string value;
                         string type = reader.GetDataTypeName(i);
                         switch (type)
                         {
                             case "decimal":
                                 // get value from reader, convert to string, check if null then use "" (?? is null-coalescing operator)
-                                string value = reader[i].ToString() ?? "";
+                                value = reader[i].ToString() ?? "";
                                 // add key-value-pair: use "-1" if value is empty (conditional operator),
                                 // replace decimal separator "," by "." (by default, the thousend separator doesn't occure in ToString())
                                 sibBw.numberValues.Add(reader.GetName(i),  ((value != "") ? value : "-1").Replace(",","."));
+                                break;
+                            case "datetime":
+                                // get value from reader, convert to datetime, convert to formated string
+                                value = Convert.ToDateTime(reader[i]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss");
+                                sibBw.dateValues.Add(reader.GetName(i), value);
                                 break;
                             case "char":
                             case "varchar":
