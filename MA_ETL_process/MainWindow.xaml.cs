@@ -55,7 +55,7 @@ namespace MA_ETL_process
             //System.Diagnostics.Process.Start(LoginCredentials.Neo4jBatFilePath, "stop").WaitForExit();
         }
 
-        private void btn_CreateConstraints_Click(object sender, RoutedEventArgs e)
+        private void createConstraints()
         {
             if (neo4jDriver == null)
             {
@@ -106,7 +106,7 @@ namespace MA_ETL_process
             // test-purpose: starting at <index>, take <count> bridges with GetRange(<index>, <count>)
             bridgeNumbers = bridgeNumbers.GetRange(0, 5);
 
-            btn_CreateConstraints_Click(sender, e);
+            createConstraints();
 
             string query = "";
             int queryMaxLength = 100000;
