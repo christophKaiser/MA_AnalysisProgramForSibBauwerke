@@ -12,12 +12,6 @@ namespace MA_ETL_process
         public Dictionary<string, string> numberValues = new Dictionary<string, string>();
         public Dictionary<string, string> dateValues = new Dictionary<string, string>();
 
-        public string GetCypherConstraintKey(string label)
-        {
-            // CREATE CONSTRAINT constraint_name FOR (n:Label) REQUIRE n.property IS NODE KEY
-            return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
-        }
-
         protected string GetCypherCreate(
            string cypherIdentifier, string lable, 
            KeyValuePair<string, string> cypherIdentifierCustom = new KeyValuePair<string, string>())
@@ -60,6 +54,15 @@ namespace MA_ETL_process
 
             // close properties-parenthes and CREATE-parenthesis; return string
             return cypher += "})";
+        }
+    }
+
+    internal static class SibBW_constAttributes
+    {
+        public static string GetCypherConstraintKey(string label)
+        {
+            // CREATE CONSTRAINT constraint_name FOR (n:Label) REQUIRE n.property IS NODE KEY
+            return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
         }
     }
 

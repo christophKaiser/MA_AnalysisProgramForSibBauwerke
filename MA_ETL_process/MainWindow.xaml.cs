@@ -128,10 +128,9 @@ namespace MA_ETL_process
             sibBw_labels.Add(SibBW_PRUFALT_constAttributes.label);
             sibBw_labels.Add(SibBW_SCHADALT_constAttributes.label);
 
-            SibBw sibBw_dummy = new SibBw();
             foreach (string label in sibBw_labels)
             {
-                string cypherString = sibBw_dummy.GetCypherConstraintKey(label);
+                string cypherString = SibBW_constAttributes.GetCypherConstraintKey(label);
                 Utilities.ConsoleLog(cypherString);
                 neo4jDriver.ExecuteCypherQuery(cypherString);
                 // neo4j requires the "CREATE CONSTRAINTS" to be single statements in _session.Run(..)
