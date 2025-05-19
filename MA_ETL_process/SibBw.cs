@@ -66,36 +66,49 @@ namespace MA_ETL_process
     internal class SibBW_GES_BW : SibBw
     {
         public string identifier { get { return ("BWNR" + stringValues["BWNR"]).Replace(" ", "_"); } }
-        public string label = "GES_BW";
+        
         public List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label);
+            return GetCypherCreate(identifier, SibBW_GES_BW_constAttributes.label);
         }
+    }
+
+    internal static class SibBW_GES_BW_constAttributes
+    {
+        public static string label = "GES_BW";
     }
 
     internal class SibBW_TEIL_BW : SibBw
     {
         public string identifier { get { return ("ID_NR" + stringValues["ID_NR"]).Replace(" ", "_"); } }
-        public string label = "TEIL_BW";
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label);
+            return GetCypherCreate(identifier, SibBW_TEIL_BW_constAttributes.label);
         }
+    }
+
+    internal static class SibBW_TEIL_BW_constAttributes
+    {
+        public static string label = "TEIL_BW";
     }
 
     internal class SibBW_PRUFALT : SibBw
     {
         public string identifier { get { return ("ID_NR" + stringValues["ID_NR"] + 
                     "_" + numberValues["PRUFJAHR"] + "_" + stringValues["PRUFART"]).Replace(" ", "_"); } }
-        public string label = "PRUFALT";
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label);
+            return GetCypherCreate(identifier, SibBW_PRUFALT_constAttributes.label);
         }
+    }
+
+    internal static class SibBW_PRUFALT_constAttributes
+    {
+        public static string label = "PRUFALT";
     }
 
     internal class SibBW_SCHADFALT : SibBw
@@ -115,11 +128,15 @@ namespace MA_ETL_process
                     "_" + numberValues["PRUFJAHR"] + "_" + stringValues["PRA"]).Replace(" ", "_");
             }
         }
-        public string label = "SCHADALT";
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label, KeyValuePair.Create("identifierPruf", identifierPruf));
+            return GetCypherCreate(identifier, SibBW_SCHADALT_constAttributes.label, KeyValuePair.Create("identifierPruf", identifierPruf));
         }
+    }
+
+    internal static class SibBW_SCHADALT_constAttributes
+    {
+        public static string label = "SCHADALT";
     }
 }

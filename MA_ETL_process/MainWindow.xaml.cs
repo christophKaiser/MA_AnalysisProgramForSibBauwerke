@@ -123,10 +123,10 @@ namespace MA_ETL_process
             }
 
             List<string> sibBw_labels = [];
-            sibBw_labels.Add(new SibBW_GES_BW().label);
-            sibBw_labels.Add(new SibBW_TEIL_BW().label);
-            sibBw_labels.Add(new SibBW_PRUFALT().label);
-            sibBw_labels.Add(new SibBW_SCHADFALT().label);
+            sibBw_labels.Add(SibBW_GES_BW_constAttributes.label);
+            sibBw_labels.Add(SibBW_TEIL_BW_constAttributes.label);
+            sibBw_labels.Add(SibBW_PRUFALT_constAttributes.label);
+            sibBw_labels.Add(SibBW_SCHADALT_constAttributes.label);
 
             SibBw sibBw_dummy = new SibBw();
             foreach (string label in sibBw_labels)
