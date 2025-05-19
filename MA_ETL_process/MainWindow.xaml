@@ -41,6 +41,8 @@
             <WrapPanel>
                 <Button x:Name="btn_CreateGraphProjection" Content="Create Graph Projection"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateGraphProjection_Click"/>
+                <Button x:Name="btn_NodeSimilarityDamageType" Content="Node Similarity of Damage Types"
+                    Style="{StaticResource ButtonStyle}" Click="btn_NodeSimilarityDamageType_Click"/>
             </WrapPanel>
             <WrapPanel>
                 <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"

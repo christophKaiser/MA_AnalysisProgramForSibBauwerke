@@ -308,6 +308,40 @@ namespace MA_ETL_process
             buttonsSwitchClickableTo(true);
         }
 
+        private async void btn_NodeSimilarityDamageType_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Utilities.ConsoleLog("Executing algorithem of node similarity ...");
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
+                    "CALL gds.nodeSimilarity.write(\r\n" +
+                    "  'prufSchadentyp',\r\n" +
+                    "  {\r\n" +
+                    "    similarityCutoff: 0.25,\r\n" +
+                    "    writeRelationshipType: 'SIMILAR',\r\n" +
+                    "    writeProperty: 'similarity_schadensmuster'\r\n" +
+                    "  }\r\n" +
+                    ")\r\n" +
+                    "YIELD nodesCompared, relationshipsWritten, similarityDistribution").ToList();
+
+                Utilities.ConsoleLog($"Node Similarity compared {records[0]["nodesCompared"]} nodes " +
+                    $"and wrote {records[0]["relationshipsWritten"]} relationships ':SIMILAR'");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
+
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)
