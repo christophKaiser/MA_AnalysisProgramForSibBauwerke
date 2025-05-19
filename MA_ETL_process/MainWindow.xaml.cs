@@ -153,18 +153,18 @@ namespace MA_ETL_process
             }
 
             // Extract Bauwerk from database
-            List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(static_SibBW_GES_BW.sqlQuery(bridgeNumber));
+            List<SibBW_GES_BW> GES_BWs = sqlClient.SelectRows<SibBW_GES_BW>(static_SibBW_GES_BW.sqlQuery(bridgeNumber));
             // Extract Teilbauwerke from database
-            List<SibBW_TEIL_BW> teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(static_SibBW_TEIL_BW.sqlQuery(bridgeNumber));
+            List<SibBW_TEIL_BW> TEIL_BWs = sqlClient.SelectRows<SibBW_TEIL_BW>(static_SibBW_TEIL_BW.sqlQuery(bridgeNumber));
             // Extract PrüfungenAlt from database
-            List<SibBW_PRUFALT> pruefungenAlt_List = sqlClient.SelectRows<SibBW_PRUFALT>(static_SibBW_PRUFALT.sqlQuery(bridgeNumber));
+            List<SibBW_PRUFALT> PPRUFALTs = sqlClient.SelectRows<SibBW_PRUFALT>(static_SibBW_PRUFALT.sqlQuery(bridgeNumber));
             // Extract SchädenAlt from database
-            List<SibBW_SCHADFALT> schadAlt_List = sqlClient.SelectRows<SibBW_SCHADFALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
+            List<SibBW_SCHADFALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADFALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
 
 
-            foreach (SibBW_GES_BW BW in BWs)
+            foreach (SibBW_GES_BW ges_bw in GES_BWs)
             {
-                query += BW.GetCypherCreate() + "\n";
+                query += ges_bw.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
                     SendCypherQuery(ref query);
@@ -173,9 +173,9 @@ namespace MA_ETL_process
             SendCypherQuery(ref query);
             //Utilities.ConsoleLog($"sent {BWs.Count} CREATE statements in total for GES_BW");
 
-            foreach (SibBW_TEIL_BW teil_BW in teilbauwerke)
+            foreach (SibBW_TEIL_BW teil_bw in TEIL_BWs)
             {
-                query += teil_BW.GetCypherCreate() + "\n";
+                query += teil_bw.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
                     SendCypherQuery(ref query);
@@ -184,9 +184,9 @@ namespace MA_ETL_process
             SendCypherQuery(ref query);
             //Utilities.ConsoleLog($"sent {teilbauwerke.Count} CREATE statements in total for TEIL_BW");
 
-            foreach (SibBW_PRUFALT pruefungAlt in pruefungenAlt_List)
+            foreach (SibBW_PRUFALT prufAlt in PPRUFALTs)
             {
-                query += pruefungAlt.GetCypherCreate() + "\n";
+                query += prufAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
                     SendCypherQuery(ref query);
@@ -195,7 +195,7 @@ namespace MA_ETL_process
             SendCypherQuery(ref query);
             //Utilities.ConsoleLog($"sent {pruefungenAlt_List.Count} CREATE statements in total for PRUFALT");
 
-            foreach (SibBW_SCHADFALT schadAlt in schadAlt_List)
+            foreach (SibBW_SCHADFALT schadAlt in SCHADALTs)
             {
                 query += schadAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
