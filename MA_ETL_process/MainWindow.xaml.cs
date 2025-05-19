@@ -123,14 +123,14 @@ namespace MA_ETL_process
             }
 
             List<string> sibBw_labels = [];
-            sibBw_labels.Add(SibBW_GES_BW_constAttributes.label);
-            sibBw_labels.Add(SibBW_TEIL_BW_constAttributes.label);
-            sibBw_labels.Add(SibBW_PRUFALT_constAttributes.label);
-            sibBw_labels.Add(SibBW_SCHADALT_constAttributes.label);
+            sibBw_labels.Add(static_SibBW_GES_BW.label);
+            sibBw_labels.Add(static_SibBW_TEIL_BW.label);
+            sibBw_labels.Add(static_SibBW_PRUFALT.label);
+            sibBw_labels.Add(static_SibBW_SCHADALT.label);
 
             foreach (string label in sibBw_labels)
             {
-                string cypherString = SibBW_constAttributes.GetCypherConstraintKey(label);
+                string cypherString = static_SibBW.GetCypherConstraintKey(label);
                 Utilities.ConsoleLog(cypherString);
                 neo4jDriver.ExecuteCypherQuery(cypherString);
                 // neo4j requires the "CREATE CONSTRAINTS" to be single statements in _session.Run(..)

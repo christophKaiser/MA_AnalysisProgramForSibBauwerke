@@ -57,7 +57,7 @@ namespace MA_ETL_process
         }
     }
 
-    internal static class SibBW_constAttributes
+    internal static class static_SibBW
     {
         public static string GetCypherConstraintKey(string label)
         {
@@ -74,11 +74,11 @@ namespace MA_ETL_process
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, SibBW_GES_BW_constAttributes.label);
+            return GetCypherCreate(identifier, static_SibBW_GES_BW.label);
         }
     }
 
-    internal static class SibBW_GES_BW_constAttributes
+    internal static class static_SibBW_GES_BW
     {
         public static string label = "GES_BW";
     }
@@ -89,11 +89,11 @@ namespace MA_ETL_process
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, SibBW_TEIL_BW_constAttributes.label);
+            return GetCypherCreate(identifier, static_SibBW_TEIL_BW.label);
         }
     }
 
-    internal static class SibBW_TEIL_BW_constAttributes
+    internal static class static_SibBW_TEIL_BW
     {
         public static string label = "TEIL_BW";
     }
@@ -105,11 +105,11 @@ namespace MA_ETL_process
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, SibBW_PRUFALT_constAttributes.label);
+            return GetCypherCreate(identifier, static_SibBW_PRUFALT.label);
         }
     }
 
-    internal static class SibBW_PRUFALT_constAttributes
+    internal static class static_SibBW_PRUFALT
     {
         public static string label = "PRUFALT";
     }
@@ -134,11 +134,11 @@ namespace MA_ETL_process
 
         public string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, SibBW_SCHADALT_constAttributes.label, KeyValuePair.Create("identifierPruf", identifierPruf));
+            return GetCypherCreate(identifier, static_SibBW_SCHADALT.label, KeyValuePair.Create("identifierPruf", identifierPruf));
         }
     }
 
-    internal static class SibBW_SCHADALT_constAttributes
+    internal static class static_SibBW_SCHADALT
     {
         public static string label = "SCHADALT";
     }
