@@ -162,6 +162,10 @@ namespace MA_ETL_process
             // Extract SchädenAlt from database
             List<SibBW_SCHADALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
 
+            // potential data preparation goes here aka. 'staging area'
+            // (nothing in the current stage of developement)
+
+            // prepare CREATE statements; send them if too many in temporal storage
             query = "";
             assembleCypherCreateQueries(GES_BWs);
             assembleCypherCreateQueries(TEIL_BWs);
