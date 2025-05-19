@@ -173,7 +173,7 @@ namespace MA_ETL_process
             assembleCypherCreateQueries(SCHADALTs);
 
             // finally, send query at the end of this bridge
-            SendCypherQuery(ref query);
+            SendCypherQuery();
 
             Utilities.ConsoleLog($"created bridge no {bridgeNumber} " +
                 $"with {TEIL_BWs.Count} TEIL_BWs, {PRUFALTs.Count} PRUFALTs, {SCHADALTs.Count} SCHADALTs");
@@ -186,12 +186,12 @@ namespace MA_ETL_process
                 query += entry.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
                 {
-                    SendCypherQuery(ref query);
+                    SendCypherQuery();
                 }
             }
         }
 
-        private void SendCypherQuery(ref string query)
+        private void SendCypherQuery()
         {
             if (query != "" && neo4jDriver != null)
             {
