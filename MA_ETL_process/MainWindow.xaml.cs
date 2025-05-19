@@ -78,6 +78,7 @@ namespace MA_ETL_process
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
             {
+                Utilities.ConsoleLog("creating bridges ...");
                 Stopwatch sw = Stopwatch.StartNew();
 
                 foreach (string bridgeNumber in bridgeNumbers)
