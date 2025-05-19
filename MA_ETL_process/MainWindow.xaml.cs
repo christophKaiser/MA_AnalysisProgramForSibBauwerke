@@ -157,7 +157,7 @@ namespace MA_ETL_process
             // Extract Teilbauwerke from database
             List<SibBW_TEIL_BW> TEIL_BWs = sqlClient.SelectRows<SibBW_TEIL_BW>(static_SibBW_TEIL_BW.sqlQuery(bridgeNumber));
             // Extract PrüfungenAlt from database
-            List<SibBW_PRUFALT> PPRUFALTs = sqlClient.SelectRows<SibBW_PRUFALT>(static_SibBW_PRUFALT.sqlQuery(bridgeNumber));
+            List<SibBW_PRUFALT> PRUFALTs = sqlClient.SelectRows<SibBW_PRUFALT>(static_SibBW_PRUFALT.sqlQuery(bridgeNumber));
             // Extract SchädenAlt from database
             List<SibBW_SCHADALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
 
@@ -182,7 +182,7 @@ namespace MA_ETL_process
             }
             //Utilities.ConsoleLog($"sent {teilbauwerke.Count} CREATE statements in total for TEIL_BW");
 
-            foreach (SibBW_PRUFALT prufAlt in PPRUFALTs)
+            foreach (SibBW_PRUFALT prufAlt in PRUFALTs)
             {
                 query += prufAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
