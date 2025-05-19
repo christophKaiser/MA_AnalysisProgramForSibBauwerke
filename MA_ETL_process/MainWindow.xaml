@@ -32,13 +32,15 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateAllBridges_Click"/>
                 <Button x:Name="btn_CreateRelationshipsAllBridges" Content="Create relationships between all bridges"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateRelationshipsAllBridges_Click"/>
+                <Button x:Name="btn_CreatePropertyNodes" Content="Create Property-Nodes"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreatePropertyNodes_Click"/>
             </WrapPanel>
         </StackPanel>
 
         <StackPanel Grid.Column="1" Grid.Row="0">
             <WrapPanel>
-                <Button x:Name="btn_CreatePropertyNodes" Content="Create Property Nodes"
-                    Style="{StaticResource ButtonStyle}" Click="btn_CreatePropertyNodes_Click"/>
+                <Button x:Name="btn_CreateGraphProjection" Content="Create Graph Projection"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreateGraphProjection_Click"/>
             </WrapPanel>
             <WrapPanel>
                 <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"

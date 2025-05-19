@@ -275,6 +275,39 @@ namespace MA_ETL_process
             buttonsSwitchClickableTo(true);
         }
 
+        private async void btn_CreateGraphProjection_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Utilities.ConsoleLog("creating projection ...");
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (source:PRUFALT)-[]-(s:SCHADALT)-[]-(target:SCHADENTYP)\r\n" +
+                    "WITH source, target\r\n" +
+                    "WITH gds.graph.project(\r\n" +
+                    "    'prufSchadentyp',\r\n" +
+                    "    source,\r\n" +
+                    "    target,\r\n" +
+                    "    '*'\r\n" +
+                    ") AS g\r\n" +
+                    "RETURN g.graphName AS graph, g.nodeCount AS nodes, g.relationshipCount AS rels").ToList();
+
+                Utilities.ConsoleLog($"Created graph projection '{records[0]["graph"]}' " +
+                    $"with {records[0]["nodes"]} nodes and {records[0]["rels"]} relationships");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)
