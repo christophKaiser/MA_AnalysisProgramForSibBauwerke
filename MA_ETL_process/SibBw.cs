@@ -6,17 +6,13 @@ using System.Threading.Tasks;
 
 namespace MA_ETL_process
 {
-    internal class SibBw
+    internal abstract class SibBw
     {
         public Dictionary<string, string> stringValues = new Dictionary<string, string>();
         public Dictionary<string, string> numberValues = new Dictionary<string, string>();
         public Dictionary<string, string> dateValues = new Dictionary<string, string>();
 
-        public string GetCypherConstraintKey(string label)
-        {
-            // CREATE CONSTRAINT constraint_name FOR (n:Label) REQUIRE n.property IS NODE KEY
-            return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
-        }
+        public abstract string GetCypherCreate();
 
         protected string GetCypherCreate(
            string cypherIdentifier, string lable, 
@@ -61,34 +57,75 @@ namespace MA_ETL_process
             // close properties-parenthes and CREATE-parenthesis; return string
             return cypher += "})";
         }
+    }
 
-        protected string GetCypherMerge(string identifierBase, string identifierTarget, string label)
+    internal static class static_SibBW
+    {
+        public static string GetCypherConstraintKey(string label)
         {
-            // MERGE (a)-[r:ACTED_IN]->(b) SET r.roles = ['Carol Danvers']
-            return $"MERGE ({identifierBase})-[:{label}]->({identifierTarget})";
+            // CREATE CONSTRAINT constraint_name FOR (n:Label) REQUIRE n.property IS NODE KEY
+            return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
         }
     }
 
     internal class SibBW_GES_BW : SibBw
     {
         public string identifier { get { return ("BWNR" + stringValues["BWNR"]).Replace(" ", "_"); } }
-        public string label = "GES_BW";
+        
         public List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
 
-        public string GetCypherCreate()
+        public override string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label);
+            return GetCypherCreate(identifier, static_SibBW_GES_BW.label);
+        }
+    }
+
+    internal static class static_SibBW_GES_BW
+    {
+        public static string label = "GES_BW";
+        public static string sqlQuery(string bridgeNumber)
+        {
+            // ... SELECT TOP (100) [BWNR], ...
+            return "SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]\n" +
+                "FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]\n" +
+                "WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]\n" +
+                $"IN ('{bridgeNumber}')";
+        }
+        public static string GetCypherMergeToTeilBW()
+        {
+            return "MATCH (bw:GES_BW)\r\n" +
+                "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
+                "MERGE (bw)-[r:bw_teilBw]->(teilBw)\r\n" +
+                "RETURN count(r)";
         }
     }
 
     internal class SibBW_TEIL_BW : SibBw
     {
         public string identifier { get { return ("ID_NR" + stringValues["ID_NR"]).Replace(" ", "_"); } }
-        public string label = "TEIL_BW";
 
-        public string GetCypherCreate()
+        public override string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label);
+            return GetCypherCreate(identifier, static_SibBW_TEIL_BW.label);
+        }
+    }
+
+    internal static class static_SibBW_TEIL_BW
+    {
+        public static string label = "TEIL_BW";
+        public static string sqlQuery(string bridgeNumber)
+        {
+            return "SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]\n" +
+                "FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]\n" +
+                "WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]\n" +
+                $"IN('{bridgeNumber}')";
+        }
+        public static string GetCypherMergeToPRUFALT()
+        {
+            return "MATCH (teilBw:TEIL_BW)\r\n" +
+                "MATCH (prufAlt:PRUFALT) WHERE teilBw.ID_NR = prufAlt.ID_NR\r\n" +
+                "MERGE (teilBw)-[r:teilBw_prufAlt]->(prufAlt)\r\n" +
+                "RETURN count(r)";
         }
     }
 
@@ -96,15 +133,36 @@ namespace MA_ETL_process
     {
         public string identifier { get { return ("ID_NR" + stringValues["ID_NR"] + 
                     "_" + numberValues["PRUFJAHR"] + "_" + stringValues["PRUFART"]).Replace(" ", "_"); } }
-        public string label = "PRUFALT";
 
-        public string GetCypherCreate()
+        public override string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label);
+            return GetCypherCreate(identifier, static_SibBW_PRUFALT.label);
         }
     }
 
-    internal class SibBW_SCHADFALT : SibBw
+    internal static class static_SibBW_PRUFALT
+    {
+        public static string label = "PRUFALT";
+        public static string sqlQuery(string bridgeNumber)
+        {
+            // all DB-entries: "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]"
+            return "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [AMT], [PRUFART], [PRUFJAHR], " +
+                "[PRUFDAT1], [PRUFDAT2], [ER_ZUSTAND], [ZS_MINTRAG], " +
+                "[IDENT], [MAX_S], [MAX_V], [MAX_D]\n" +
+                "FROM[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT]\n" +
+                "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT].[BWNR]\n" +
+                $"IN('{bridgeNumber}')";
+        }
+        public static string GetCypherMergeToSCHADALT()
+        {
+            return "MATCH (prufAlt:PRUFALT)\r\n" +
+                "MATCH (schadAlt:SCHADALT) WHERE prufAlt.identifier = schadAlt.identifierPruf\r\n" +
+                "MERGE (prufAlt)-[r:prufAlt_schadAlt]->(schadAlt)\r\n" +
+                "RETURN count(r)";
+        }
+    }
+
+    internal class SibBW_SCHADALT : SibBw
     {
         public string identifier { get {
                 // ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
@@ -121,11 +179,29 @@ namespace MA_ETL_process
                     "_" + numberValues["PRUFJAHR"] + "_" + stringValues["PRA"]).Replace(" ", "_");
             }
         }
-        public string label = "SCHADALT";
 
-        public string GetCypherCreate()
+        public override string GetCypherCreate()
         {
-            return GetCypherCreate(identifier, label, KeyValuePair.Create("identifierPruf", identifierPruf));
+            return GetCypherCreate(identifier, static_SibBW_SCHADALT.label, KeyValuePair.Create("identifierPruf", identifierPruf));
+        }
+    }
+
+    internal static class static_SibBW_SCHADALT
+    {
+        public static string label = "SCHADALT";
+        public static string sqlQuery(string bridgeNumber)
+        {
+            // SchadenAlt hängt an Prüfung via ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
+            // zur eindeutige Identifizierung des Schadens: LFDNR und SCHAD_ID sind nicht konsistent; Bedeutung IDENT ist unklar
+            // all DB-entries: SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], [SCHADEN_M], [MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [UEBERBAU_M], [FELD], [FELD_M], [LAENGS], [LAENGS_M], [QUER], [QUER_M], [HOCH], [HOCH_M], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], [BEMERK2], [BEMERK2_M], [BEMERK3], [BEMERK3_M], [BEMERK4], [BEMERK4_M], [BEMERK5], [BEMERK5_M], [BEMERK6], [BEMERK6_M], [BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], [TEXT], [BILD], [KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]
+            return "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], " +
+                "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
+                "[QUER], [QUER_M], [HOCH], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
+                "[BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], " +
+                "[KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]\n" +
+                "FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]\n" +
+                "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR]\n" +
+                $"IN('{bridgeNumber}')";
         }
     }
 }

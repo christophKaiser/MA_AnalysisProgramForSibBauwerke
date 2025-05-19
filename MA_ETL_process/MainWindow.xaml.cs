@@ -21,6 +21,8 @@ namespace MA_ETL_process
     {
         SqlClient? sqlClient = null;
         Neo4jDriver? neo4jDriver = null;
+        int queryMaxLength = 100000;
+        string query = "";
 
         public MainWindow()
         {
@@ -29,7 +31,7 @@ namespace MA_ETL_process
             Utilities.ConsoleLog("Click a button");
         }
 
-        private void buttonsAreEnabled(bool stage)
+        private void buttonsSwitchClickableTo(bool stage)
         {
             foreach (Button button in buttonsList(mainWindow))
             {
@@ -68,7 +70,38 @@ namespace MA_ETL_process
                 return;
             }
 
-            buttonsAreEnabled(false);
+            buttonsSwitchClickableTo(false);
+
+            List<string> bridgeNumbers = getBridgeNumbers();
+            createConstraints();
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Stopwatch sw = Stopwatch.StartNew();
+
+                foreach (string bridgeNumber in bridgeNumbers)
+                {
+                    extractAndLoadBridge(bridgeNumber);
+                }
+
+                sw.Stop();
+                Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
+
+                Utilities.ConsoleLog("'Create all bridges' finished");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
+        private List<string> getBridgeNumbers()
+        {
+            if(sqlClient == null)
+            {
+                Utilities.ConsoleLog("no SQL connection");
+                return [];
+            }
 
             List<string> bridgeNumbers = sqlClient.SelectRowsOneColumn("BRUECKE", "BWNR");
             // bridgeNumbers.Count(): 20349
@@ -78,132 +111,7 @@ namespace MA_ETL_process
             // bridgeNumbers.Count(): 17504
 
             // test-purpose: starting at <index>, take <count> bridges with GetRange(<index>, <count>)
-            bridgeNumbers = bridgeNumbers.GetRange(0, 5);
-
-            createConstraints();
-
-            string query = "";
-            int queryMaxLength = 100000;
-
-            // start new thread beside the UI-thread (which the button would use)
-            Task task = Task.Run(() =>
-            {
-                Stopwatch sw = Stopwatch.StartNew();
-
-                // ---
-
-                Utilities.ConsoleLog("\nBauwerke");
-                List<SibBW_GES_BW> BWs = sqlClient.SelectRows<SibBW_GES_BW>(
-                    // ... SELECT TOP (100) [BWNR], ...
-                    $@"SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]
-                FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]
-                WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]
-                IN ('{String.Join("', '", bridgeNumbers)}')");
-
-                foreach (SibBW_GES_BW BW in BWs)
-                {
-                    query += BW.GetCypherCreate() + "\n";
-                    if (query.Length > queryMaxLength)
-                    {
-                        SendCypherQuery(ref query);
-                    }
-                }
-                SendCypherQuery(ref query);
-                Utilities.ConsoleLog($"sent {BWs.Count} CREATE statements in total for GES_BW");
-                BWs.Clear();
-
-                // ---
-
-                Utilities.ConsoleLog("\nTeilbauwerke");
-                List<SibBW_TEIL_BW> teilbauwerke = sqlClient.SelectRows<SibBW_TEIL_BW>(
-                    $@"SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]
-                FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]
-                WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]
-                IN ('{String.Join("', '", bridgeNumbers)}')");
-
-                foreach (SibBW_TEIL_BW teil_BW in teilbauwerke)
-                {
-                    query += teil_BW.GetCypherCreate() + "\n";
-                    if (query.Length > queryMaxLength)
-                    {
-                        SendCypherQuery(ref query);
-                    }
-                }
-                SendCypherQuery(ref query);
-                Utilities.ConsoleLog($"sent {teilbauwerke.Count} CREATE statements in total for TEIL_BW");
-                teilbauwerke.Clear();
-
-                // ---
-
-                //all DB-entries: "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]"
-                Utilities.ConsoleLog("\nPrüfungen Alt");
-                List<SibBW_PRUFALT> pruefungenAlt_List = sqlClient.SelectRows<SibBW_PRUFALT>(
-                    "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [AMT], [PRUFART], [PRUFJAHR], " +
-                    "[PRUFDAT1], [PRUFDAT2], [ER_ZUSTAND], [ZS_MINTRAG], " +
-                    "[IDENT], [MAX_S], [MAX_V], [MAX_D]" +
-                    "FROM[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT]" +
-                    "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT].[BWNR]" +
-                    $"IN('{String.Join("', '", bridgeNumbers)}')");
-
-                foreach (SibBW_PRUFALT pruefungAlt in pruefungenAlt_List)
-                {
-                    query += pruefungAlt.GetCypherCreate() + "\n";
-                    if (query.Length > queryMaxLength)
-                    {
-                        SendCypherQuery(ref query);
-                    }
-                }
-                SendCypherQuery(ref query);
-                Utilities.ConsoleLog($"sent {pruefungenAlt_List.Count} CREATE statements in total for PRUFALT");
-                pruefungenAlt_List.Clear();
-
-                // ---
-
-                // SchadenAlt hängt an Prüfung via ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
-                // aber (!!) noch keine eindeutige identifizierung des Schadens gefunden (LFDNR und SCHAD_ID sind nicht konsistent)
-                // vielleicht IDENT nutzen, auch wenn Bedeutung unklar ??
-                //all DB-entries: SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], [SCHADEN_M], [MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [UEBERBAU_M], [FELD], [FELD_M], [LAENGS], [LAENGS_M], [QUER], [QUER_M], [HOCH], [HOCH_M], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], [BEMERK2], [BEMERK2_M], [BEMERK3], [BEMERK3_M], [BEMERK4], [BEMERK4_M], [BEMERK5], [BEMERK5_M], [BEMERK6], [BEMERK6_M], [BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], [TEXT], [BILD], [KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]
-                //FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]
-                //WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR] = 8142509;
-                Utilities.ConsoleLog("\nSchäden Alt");
-                int nSchadAlt = 0;
-                foreach (string bridgeNumber in bridgeNumbers)
-                {
-                    List<SibBW_SCHADFALT> schadAlt_List = sqlClient.SelectRows<SibBW_SCHADFALT>(
-                        "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], " +
-                        "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
-                        "[QUER], [QUER_M], [HOCH], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
-                        "[BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], " +
-                        "[KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]" +
-                        "FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]" +
-                        "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR]" +
-                        $"IN('{String.Join("', '", bridgeNumber)}')");
-
-                    foreach (SibBW_SCHADFALT schadAlt in schadAlt_List)
-                    {
-                        query += schadAlt.GetCypherCreate() + "\n";
-                        if (query.Length > queryMaxLength)
-                        {
-                            SendCypherQuery(ref query);
-                        }
-                    }
-                    SendCypherQuery(ref query);
-                    nSchadAlt += schadAlt_List.Count;
-                    schadAlt_List.Clear();
-                    Utilities.ConsoleLog($"sent Schäden for bridge no. {bridgeNumber}");
-                }
-                Utilities.ConsoleLog($"sent {nSchadAlt} CREATE statements in total for SCHADFALT");
-
-                // ---
-
-                sw.Stop();
-                Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
-
-                Utilities.ConsoleLog("'Create all bridges' finished");
-            });
-
-            await task;
-            buttonsAreEnabled(true);
+            return bridgeNumbers.GetRange(0, 5);
         }
 
         private void createConstraints()
@@ -215,15 +123,14 @@ namespace MA_ETL_process
             }
 
             List<string> sibBw_labels = [];
-            sibBw_labels.Add(new SibBW_GES_BW().label);
-            sibBw_labels.Add(new SibBW_TEIL_BW().label);
-            sibBw_labels.Add(new SibBW_PRUFALT().label);
-            sibBw_labels.Add(new SibBW_SCHADFALT().label);
+            sibBw_labels.Add(static_SibBW_GES_BW.label);
+            sibBw_labels.Add(static_SibBW_TEIL_BW.label);
+            sibBw_labels.Add(static_SibBW_PRUFALT.label);
+            sibBw_labels.Add(static_SibBW_SCHADALT.label);
 
-            SibBw sibBw_dummy = new SibBw();
             foreach (string label in sibBw_labels)
             {
-                string cypherString = sibBw_dummy.GetCypherConstraintKey(label);
+                string cypherString = static_SibBW.GetCypherConstraintKey(label);
                 Utilities.ConsoleLog(cypherString);
                 neo4jDriver.ExecuteCypherQuery(cypherString);
                 // neo4j requires the "CREATE CONSTRAINTS" to be single statements in _session.Run(..)
@@ -232,7 +139,59 @@ namespace MA_ETL_process
             Utilities.ConsoleLog("created constriants");
         }
 
-        private void SendCypherQuery(ref string query)
+        private void extractAndLoadBridge(string bridgeNumber)
+        {
+            if (sqlClient == null)
+            {
+                Utilities.ConsoleLog("no SQL connection");
+                return;
+            }
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            // Extract Bauwerk from database
+            // GES_BWs will only have one entry due to the outer foreach, but still uses the same functions as the other tables
+            List<SibBW_GES_BW> GES_BWs = sqlClient.SelectRows<SibBW_GES_BW>(static_SibBW_GES_BW.sqlQuery(bridgeNumber));
+            // Extract Teilbauwerke from database
+            List<SibBW_TEIL_BW> TEIL_BWs = sqlClient.SelectRows<SibBW_TEIL_BW>(static_SibBW_TEIL_BW.sqlQuery(bridgeNumber));
+            // Extract PrüfungenAlt from database
+            List<SibBW_PRUFALT> PRUFALTs = sqlClient.SelectRows<SibBW_PRUFALT>(static_SibBW_PRUFALT.sqlQuery(bridgeNumber));
+            // Extract SchädenAlt from database
+            List<SibBW_SCHADALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
+
+            // potential data preparation goes here aka. 'staging area'
+            // (nothing in the current stage of developement)
+
+            // prepare CREATE statements; send them if too many in temporal storage
+            query = "";
+            assembleCypherCreateQueries(GES_BWs);
+            assembleCypherCreateQueries(TEIL_BWs);
+            assembleCypherCreateQueries(PRUFALTs);
+            assembleCypherCreateQueries(SCHADALTs);
+
+            // finally, send query at the end of this bridge
+            SendCypherQuery();
+
+            Utilities.ConsoleLog($"created bridge no {bridgeNumber} " +
+                $"with {TEIL_BWs.Count} TEIL_BWs, {PRUFALTs.Count} PRUFALTs, {SCHADALTs.Count} SCHADALTs");
+        }
+
+        private void assembleCypherCreateQueries<T>(List<T> entryList) where T : SibBw
+        {
+            foreach (T entry in entryList)
+            {
+                query += entry.GetCypherCreate() + "\n";
+                if (query.Length > queryMaxLength)
+                {
+                    SendCypherQuery();
+                }
+            }
+        }
+
+        private void SendCypherQuery()
         {
             if (query != "" && neo4jDriver != null)
             {
@@ -249,36 +208,24 @@ namespace MA_ETL_process
                 return;
             }
 
-            buttonsAreEnabled(false);
+            buttonsSwitchClickableTo(false);
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                var x = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH (bw:GES_BW)\r\n" +
-                    "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
-                    "MERGE (bw)-[r:bw_teilBw]->(teilBw)\r\n" +
-                    "RETURN count(r)").ToList();
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(static_SibBW_GES_BW.GetCypherMergeToTeilBW()).ToList();
+                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                    $"from {static_SibBW_GES_BW.label} to {static_SibBW_TEIL_BW.label}");
 
-                Utilities.ConsoleLog($"relationships created, there are {x[0]["count(r)"]} relationships fitting the pattern");
+                records = neo4jDriver.ExecuteCypherQuery(static_SibBW_TEIL_BW.GetCypherMergeToPRUFALT()).ToList();
+                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                    $"from {static_SibBW_TEIL_BW.label} to {static_SibBW_PRUFALT.label}");
 
-                var y = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH (teilBw:TEIL_BW)\r\n" +
-                    "MATCH (prufAlt:PRUFALT) WHERE teilBw.ID_NR = prufAlt.ID_NR\r\n" +
-                    "MERGE (teilBw)-[r:teilBw_prufAlt]->(prufAlt)\r\n" +
-                    "RETURN count(r)").ToList();
-
-                Utilities.ConsoleLog($"relationships created, there are {y[0]["count(r)"]} relationships fitting the pattern");
-
-                var z = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH (prufAlt:PRUFALT)\r\n" +
-                    "MATCH (schadAlt:SCHADALT) WHERE prufAlt.identifier = schadAlt.identifierPruf\r\n" +
-                    "MERGE (prufAlt)-[r:prufAlt_schadAlt]->(schadAlt)\r\n" +
-                    "RETURN count(r)").ToList();
-
-                Utilities.ConsoleLog($"relationships created, there are {z[0]["count(r)"]} relationships fitting the pattern");
+                var z = neo4jDriver.ExecuteCypherQuery(static_SibBW_PRUFALT.GetCypherMergeToSCHADALT()).ToList();
+                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                    $"from {static_SibBW_PRUFALT.label} to {static_SibBW_SCHADALT.label}");
 
                 sw.Stop();
             
@@ -286,7 +233,7 @@ namespace MA_ETL_process
             });
 
             await task;
-            buttonsAreEnabled(true);
+            buttonsSwitchClickableTo(true);
         }
 
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
@@ -297,7 +244,7 @@ namespace MA_ETL_process
                 return;
             }
 
-            buttonsAreEnabled(false);
+            buttonsSwitchClickableTo(false);
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
@@ -317,15 +264,15 @@ namespace MA_ETL_process
                     "}\r\n" +
                     "//RETURN psCollection\r\n");
 
-                var x = neo4jDriver.ExecuteCypherQuery(
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
                     "MATCH r=(:PRUFALT)-[:hat_vorherige_prufAlt]->(:PRUFALT)\r\n" +
                     "RETURN DISTINCT count(r)").ToList();
 
-                Utilities.ConsoleLog($"created {x[0]["count(r)"]} relationships ':hat_vorherige_prufAlt'");
+                Utilities.ConsoleLog($"created {records[0]["count(r)"]} relationships ':hat_vorherige_prufAlt'");
             });
 
             await task;
-            buttonsAreEnabled(true);
+            buttonsSwitchClickableTo(true);
         }
 
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
