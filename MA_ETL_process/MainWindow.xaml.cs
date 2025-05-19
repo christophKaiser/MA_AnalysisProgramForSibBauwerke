@@ -215,29 +215,17 @@ namespace MA_ETL_process
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                var x = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH (bw:GES_BW)\r\n" +
-                    "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
-                    "MERGE (bw)-[r:bw_teilBw]->(teilBw)\r\n" +
-                    "RETURN count(r)").ToList();
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(static_SibBW_GES_BW.GetCypherMergeToTeilBW()).ToList();
+                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                    $"from {static_SibBW_GES_BW.label} to {static_SibBW_TEIL_BW.label}");
 
-                Utilities.ConsoleLog($"relationships created, there are {x[0]["count(r)"]} relationships fitting the pattern");
+                records = neo4jDriver.ExecuteCypherQuery(static_SibBW_TEIL_BW.GetCypherMergeToPRUFALT()).ToList();
+                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                    $"from {static_SibBW_TEIL_BW.label} to {static_SibBW_PRUFALT.label}");
 
-                var y = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH (teilBw:TEIL_BW)\r\n" +
-                    "MATCH (prufAlt:PRUFALT) WHERE teilBw.ID_NR = prufAlt.ID_NR\r\n" +
-                    "MERGE (teilBw)-[r:teilBw_prufAlt]->(prufAlt)\r\n" +
-                    "RETURN count(r)").ToList();
-
-                Utilities.ConsoleLog($"relationships created, there are {y[0]["count(r)"]} relationships fitting the pattern");
-
-                var z = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH (prufAlt:PRUFALT)\r\n" +
-                    "MATCH (schadAlt:SCHADALT) WHERE prufAlt.identifier = schadAlt.identifierPruf\r\n" +
-                    "MERGE (prufAlt)-[r:prufAlt_schadAlt]->(schadAlt)\r\n" +
-                    "RETURN count(r)").ToList();
-
-                Utilities.ConsoleLog($"relationships created, there are {z[0]["count(r)"]} relationships fitting the pattern");
+                var z = neo4jDriver.ExecuteCypherQuery(static_SibBW_PRUFALT.GetCypherMergeToSCHADALT()).ToList();
+                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                    $"from {static_SibBW_PRUFALT.label} to {static_SibBW_SCHADALT.label}");
 
                 sw.Stop();
             

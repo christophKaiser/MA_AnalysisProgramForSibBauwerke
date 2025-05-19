@@ -91,6 +91,13 @@ namespace MA_ETL_process
                 "WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]\n" +
                 $"IN ('{bridgeNumber}')";
         }
+        public static string GetCypherMergeToTeilBW()
+        {
+            return "MATCH (bw:GES_BW)\r\n" +
+                "MATCH (teilBw:TEIL_BW) WHERE bw.BWNR = teilBw.BWNR\r\n" +
+                "MERGE (bw)-[r:bw_teilBw]->(teilBw)\r\n" +
+                "RETURN count(r)";
+        }
     }
 
     internal class SibBW_TEIL_BW : SibBw
@@ -112,6 +119,13 @@ namespace MA_ETL_process
                 "FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]\n" +
                 "WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]\n" +
                 $"IN('{bridgeNumber}')";
+        }
+        public static string GetCypherMergeToPRUFALT()
+        {
+            return "MATCH (teilBw:TEIL_BW)\r\n" +
+                "MATCH (prufAlt:PRUFALT) WHERE teilBw.ID_NR = prufAlt.ID_NR\r\n" +
+                "MERGE (teilBw)-[r:teilBw_prufAlt]->(prufAlt)\r\n" +
+                "RETURN count(r)";
         }
     }
 
@@ -138,6 +152,13 @@ namespace MA_ETL_process
                 "FROM[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT]\n" +
                 "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT].[BWNR]\n" +
                 $"IN('{bridgeNumber}')";
+        }
+        public static string GetCypherMergeToSCHADALT()
+        {
+            return "MATCH (prufAlt:PRUFALT)\r\n" +
+                "MATCH (schadAlt:SCHADALT) WHERE prufAlt.identifier = schadAlt.identifierPruf\r\n" +
+                "MERGE (prufAlt)-[r:prufAlt_schadAlt]->(schadAlt)\r\n" +
+                "RETURN count(r)";
         }
     }
 
