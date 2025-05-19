@@ -264,11 +264,11 @@ namespace MA_ETL_process
                     "}\r\n" +
                     "//RETURN psCollection\r\n");
 
-                var x = neo4jDriver.ExecuteCypherQuery(
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
                     "MATCH r=(:PRUFALT)-[:hat_vorherige_prufAlt]->(:PRUFALT)\r\n" +
                     "RETURN DISTINCT count(r)").ToList();
 
-                Utilities.ConsoleLog($"created {x[0]["count(r)"]} relationships ':hat_vorherige_prufAlt'");
+                Utilities.ConsoleLog($"created {records[0]["count(r)"]} relationships ':hat_vorherige_prufAlt'");
             });
 
             await task;
