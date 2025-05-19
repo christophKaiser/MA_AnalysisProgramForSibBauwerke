@@ -81,6 +81,14 @@ namespace MA_ETL_process
     internal static class static_SibBW_GES_BW
     {
         public static string label = "GES_BW";
+        public static string sqlQuery(string bridgeNumber)
+        {
+            // ... SELECT TOP (100) [BWNR], ...
+            return "SELECT [BWNR], [BWNAME], [ORT], [ANZ_TEILBW], [LAENGE_BR]\n" +
+                "FROM [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW]\n" +
+                "WHERE [SIB_BAUWERKE_19_20230427].[dbo].[GES_BW].[BWNR]\n" +
+                $"IN ('{bridgeNumber}')";
+        }
     }
 
     internal class SibBW_TEIL_BW : SibBw
@@ -96,6 +104,13 @@ namespace MA_ETL_process
     internal static class static_SibBW_TEIL_BW
     {
         public static string label = "TEIL_BW";
+        public static string sqlQuery(string bridgeNumber)
+        {
+            return "SELECT [BWNR], [TEIL_BWNR], [TW_NAME], [KONSTRUKT], [ID_NR]\n" +
+                "FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]\n" +
+                "WHERE [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW].[BWNR]\n" +
+                $"IN('{bridgeNumber}')";
+        }
     }
 
     internal class SibBW_PRUFALT : SibBw
@@ -112,6 +127,16 @@ namespace MA_ETL_process
     internal static class static_SibBW_PRUFALT
     {
         public static string label = "PRUFALT";
+        public static string sqlQuery(string bridgeNumber)
+        {
+            // all DB-entries: "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]"
+            return "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [AMT], [PRUFART], [PRUFJAHR], " +
+                "[PRUFDAT1], [PRUFDAT2], [ER_ZUSTAND], [ZS_MINTRAG], " +
+                "[IDENT], [MAX_S], [MAX_V], [MAX_D]\n" +
+                "FROM[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT]\n" +
+                "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[PRUFALT].[BWNR]\n" +
+                $"IN('{bridgeNumber}')";
+        }
     }
 
     internal class SibBW_SCHADFALT : SibBw
@@ -141,5 +166,19 @@ namespace MA_ETL_process
     internal static class static_SibBW_SCHADALT
     {
         public static string label = "SCHADALT";
+        public static string sqlQuery(string bridgeNumber)
+        {
+            // SchadenAlt hängt an Prüfung via ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
+            // zur eindeutige Identifizierung des Schadens: LFDNR und SCHAD_ID sind nicht konsistent; Bedeutung IDENT ist unklar
+            // all DB-entries: SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], [SCHADEN_M], [MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [UEBERBAU_M], [FELD], [FELD_M], [LAENGS], [LAENGS_M], [QUER], [QUER_M], [HOCH], [HOCH_M], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], [BEMERK2], [BEMERK2_M], [BEMERK3], [BEMERK3_M], [BEMERK4], [BEMERK4_M], [BEMERK5], [BEMERK5_M], [BEMERK6], [BEMERK6_M], [BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], [TEXT], [BILD], [KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]
+            return "SELECT [ID_NR], [LFDNR], [BAUTEIL], [KONTEIL], [ZWGRUPPE], [SCHADEN], " +
+                "[MENGE_ALL], [MENGE_DI], [MENGE_DI_M], [UEBERBAU], [FELD], [FELD_M], [LAENGS], [LAENGS_M], " +
+                "[QUER], [QUER_M], [HOCH], [BEWERT_D], [BEWERT_V], [BEWERT_S], [S_VERAEND], [BEMERK1], [BEMERK1_M], " +
+                "[BWNR], [TEIL_BWNR], [IBWNR], [IDENT], [AMT], [PRUFJAHR], [PRA], " +
+                "[KONT_JN], [NOT_KONST], [KONVERT], [SCHAD_ID], [BSP_ID], [BAUTLGRUP], [DETAILKONT]\n" +
+                "FROM[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT]\n" +
+                "WHERE[SIB_BAUWERKE_19_20230427].[dbo].[SCHADALT].[BWNR]\n" +
+                $"IN('{bridgeNumber}')";
+        }
     }
 }
