@@ -153,6 +153,7 @@ namespace MA_ETL_process
             }
 
             // Extract Bauwerk from database
+            // GES_BWs will only have one entry due to the outer foreach, but still uses the same functions as the other tables
             List<SibBW_GES_BW> GES_BWs = sqlClient.SelectRows<SibBW_GES_BW>(static_SibBW_GES_BW.sqlQuery(bridgeNumber));
             // Extract Teilbauwerke from database
             List<SibBW_TEIL_BW> TEIL_BWs = sqlClient.SelectRows<SibBW_TEIL_BW>(static_SibBW_TEIL_BW.sqlQuery(bridgeNumber));
@@ -170,7 +171,6 @@ namespace MA_ETL_process
                     SendCypherQuery(ref query);
                 }
             }
-            //Utilities.ConsoleLog($"sent {BWs.Count} CREATE statements in total for GES_BW");
 
             foreach (SibBW_TEIL_BW teil_bw in TEIL_BWs)
             {
@@ -180,7 +180,6 @@ namespace MA_ETL_process
                     SendCypherQuery(ref query);
                 }
             }
-            //Utilities.ConsoleLog($"sent {teilbauwerke.Count} CREATE statements in total for TEIL_BW");
 
             foreach (SibBW_PRUFALT prufAlt in PRUFALTs)
             {
@@ -190,7 +189,6 @@ namespace MA_ETL_process
                     SendCypherQuery(ref query);
                 }
             }
-            //Utilities.ConsoleLog($"sent {pruefungenAlt_List.Count} CREATE statements in total for PRUFALT");
 
             foreach (SibBW_SCHADALT schadAlt in SCHADALTs)
             {
@@ -202,7 +200,9 @@ namespace MA_ETL_process
             }
             // finally, send query at the end of this bridge
             SendCypherQuery(ref query);
-            //Utilities.ConsoleLog($"sent {schadAlt_List} CREATE statements in total for SCHADFALT");
+
+            Utilities.ConsoleLog($"created bridge no {bridgeNumber} " +
+                $"with {TEIL_BWs.Count} TEIL_BWs, {PRUFALTs.Count} PRUFALTs, {SCHADALTs.Count} SCHADALTs");
         }
 
         private void SendCypherQuery(ref string query)
