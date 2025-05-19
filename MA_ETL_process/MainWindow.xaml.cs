@@ -70,16 +70,7 @@ namespace MA_ETL_process
 
             buttonsSwitchClickableTo(false);
 
-            List<string> bridgeNumbers = sqlClient.SelectRowsOneColumn("BRUECKE", "BWNR");
-            // bridgeNumbers.Count(): 20349
-
-            // remove dublicates in the list (because one entry for each Teilbauwerk)
-            bridgeNumbers = bridgeNumbers.Distinct().ToList();
-            // bridgeNumbers.Count(): 17504
-
-            // test-purpose: starting at <index>, take <count> bridges with GetRange(<index>, <count>)
-            bridgeNumbers = bridgeNumbers.GetRange(0, 5);
-
+            List<string> bridgeNumbers = getBridgeNumbers();
             createConstraints();
 
             string query = "";
@@ -204,6 +195,25 @@ namespace MA_ETL_process
 
             await task;
             buttonsSwitchClickableTo(true);
+        }
+
+        private List<string> getBridgeNumbers()
+        {
+            if(sqlClient == null)
+            {
+                Utilities.ConsoleLog("no SQL connection");
+                return [];
+            }
+
+            List<string> bridgeNumbers = sqlClient.SelectRowsOneColumn("BRUECKE", "BWNR");
+            // bridgeNumbers.Count(): 20349
+
+            // remove dublicates in the list (because one entry for each Teilbauwerk)
+            bridgeNumbers = bridgeNumbers.Distinct().ToList();
+            // bridgeNumbers.Count(): 17504
+
+            // test-purpose: starting at <index>, take <count> bridges with GetRange(<index>, <count>)
+            return bridgeNumbers.GetRange(0, 5);
         }
 
         private void createConstraints()
