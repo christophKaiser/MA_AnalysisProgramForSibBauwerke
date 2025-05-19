@@ -21,6 +21,8 @@ namespace MA_ETL_process
     {
         SqlClient? sqlClient = null;
         Neo4jDriver? neo4jDriver = null;
+        int queryMaxLength = 100000;
+        string query = "";
 
         public MainWindow()
         {
@@ -72,9 +74,6 @@ namespace MA_ETL_process
 
             List<string> bridgeNumbers = getBridgeNumbers();
             createConstraints();
-
-            string query = "";
-            int queryMaxLength = 100000;
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
