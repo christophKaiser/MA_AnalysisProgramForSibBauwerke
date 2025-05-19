@@ -61,12 +61,6 @@ namespace MA_ETL_process
             // close properties-parenthes and CREATE-parenthesis; return string
             return cypher += "})";
         }
-
-        protected string GetCypherMerge(string identifierBase, string identifierTarget, string label)
-        {
-            // MERGE (a)-[r:ACTED_IN]->(b) SET r.roles = ['Carol Danvers']
-            return $"MERGE ({identifierBase})-[:{label}]->({identifierTarget})";
-        }
     }
 
     internal class SibBW_GES_BW : SibBw
