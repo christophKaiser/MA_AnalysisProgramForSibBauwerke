@@ -37,6 +37,10 @@
 
         <StackPanel Grid.Column="1" Grid.Row="0">
             <WrapPanel>
+                <Button x:Name="btn_CreatePropertyNodes" Content="Create Property Nodes"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreatePropertyNodes_Click"/>
+            </WrapPanel>
+            <WrapPanel>
                 <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateTimeseries_Click"/>
             </WrapPanel>

@@ -236,6 +236,44 @@ namespace MA_ETL_process
             buttonsSwitchClickableTo(true);
         }
 
+        private async void btn_CreatePropertyNodes_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (s:SCHADALT)\r\n" +
+                    "UNWIND s.SCHADEN AS schadentyp\r\n" +
+                    "MERGE (st:SCHADENTYP {typId:schadentyp})\r\n" +
+                    "MERGE (s)-[:istSchadenstyp]->(st)\r\n");
+
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
+                    "CALL{\r\n" +
+                    "    MATCH(st:SCHADENTYP)\r\n" +
+                    "    RETURN count(st) as Schadenstypen\r\n" +
+                    "}\r\n" +
+                    "CALL{\r\n" +
+                    "    MATCH ()-[r:istSchadenstyp]->()\r\n" +
+                    "    RETURN count(r) as istSchadenstyp\r\n" +
+                    "}\r\n" +
+                    "RETURN Schadenstypen, istSchadenstyp").ToList();
+
+                Utilities.ConsoleLog($"The graph contains {records[0]["Schadenstypen"]} nodes of the label ':SCHADENTYP'\n" +
+                    $"The graph contains {records[0]["istSchadenstyp"]} relationships of the type ':istSchadenstyp'");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)
