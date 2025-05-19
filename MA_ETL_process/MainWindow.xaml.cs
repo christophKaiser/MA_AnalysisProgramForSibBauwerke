@@ -29,7 +29,7 @@ namespace MA_ETL_process
             Utilities.ConsoleLog("Click a button");
         }
 
-        private void buttonsAreEnabled(bool stage)
+        private void buttonsSwitchClickableTo(bool stage)
         {
             foreach (Button button in buttonsList(mainWindow))
             {
@@ -68,7 +68,7 @@ namespace MA_ETL_process
                 return;
             }
 
-            buttonsAreEnabled(false);
+            buttonsSwitchClickableTo(false);
 
             List<string> bridgeNumbers = sqlClient.SelectRowsOneColumn("BRUECKE", "BWNR");
             // bridgeNumbers.Count(): 20349
@@ -203,7 +203,7 @@ namespace MA_ETL_process
             });
 
             await task;
-            buttonsAreEnabled(true);
+            buttonsSwitchClickableTo(true);
         }
 
         private void createConstraints()
@@ -249,7 +249,7 @@ namespace MA_ETL_process
                 return;
             }
 
-            buttonsAreEnabled(false);
+            buttonsSwitchClickableTo(false);
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
@@ -286,7 +286,7 @@ namespace MA_ETL_process
             });
 
             await task;
-            buttonsAreEnabled(true);
+            buttonsSwitchClickableTo(true);
         }
 
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
@@ -297,7 +297,7 @@ namespace MA_ETL_process
                 return;
             }
 
-            buttonsAreEnabled(false);
+            buttonsSwitchClickableTo(false);
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
@@ -325,7 +325,7 @@ namespace MA_ETL_process
             });
 
             await task;
-            buttonsAreEnabled(true);
+            buttonsSwitchClickableTo(true);
         }
 
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
