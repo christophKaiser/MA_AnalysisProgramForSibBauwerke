@@ -137,7 +137,7 @@ namespace MA_ETL_process
                 // neo4j requires the "CREATE CONSTRAINTS" to be single statements in _session.Run(..)
             }
 
-            Utilities.ConsoleLog("created constriants");
+            Utilities.ConsoleLog("created constraints");
         }
 
         private void extractAndLoadBridge(string bridgeNumber)
