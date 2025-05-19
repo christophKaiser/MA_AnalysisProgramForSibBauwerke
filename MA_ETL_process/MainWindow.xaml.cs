@@ -163,46 +163,28 @@ namespace MA_ETL_process
             List<SibBW_SCHADALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
 
             query = "";
-            foreach (SibBW_GES_BW ges_bw in GES_BWs)
-            {
-                query += ges_bw.GetCypherCreate() + "\n";
-                if (query.Length > queryMaxLength)
-                {
-                    SendCypherQuery(ref query);
-                }
-            }
+            assembleCypherCreateQueries(GES_BWs);
+            assembleCypherCreateQueries(TEIL_BWs);
+            assembleCypherCreateQueries(PRUFALTs);
+            assembleCypherCreateQueries(SCHADALTs);
 
-            foreach (SibBW_TEIL_BW teil_bw in TEIL_BWs)
-            {
-                query += teil_bw.GetCypherCreate() + "\n";
-                if (query.Length > queryMaxLength)
-                {
-                    SendCypherQuery(ref query);
-                }
-            }
-
-            foreach (SibBW_PRUFALT prufAlt in PRUFALTs)
-            {
-                query += prufAlt.GetCypherCreate() + "\n";
-                if (query.Length > queryMaxLength)
-                {
-                    SendCypherQuery(ref query);
-                }
-            }
-
-            foreach (SibBW_SCHADALT schadAlt in SCHADALTs)
-            {
-                query += schadAlt.GetCypherCreate() + "\n";
-                if (query.Length > queryMaxLength)
-                {
-                    SendCypherQuery(ref query);
-                }
-            }
             // finally, send query at the end of this bridge
             SendCypherQuery(ref query);
 
             Utilities.ConsoleLog($"created bridge no {bridgeNumber} " +
                 $"with {TEIL_BWs.Count} TEIL_BWs, {PRUFALTs.Count} PRUFALTs, {SCHADALTs.Count} SCHADALTs");
+        }
+
+        private void assembleCypherCreateQueries<T>(List<T> entryList) where T : SibBw
+        {
+            foreach (T entry in entryList)
+            {
+                query += entry.GetCypherCreate() + "\n";
+                if (query.Length > queryMaxLength)
+                {
+                    SendCypherQuery(ref query);
+                }
+            }
         }
 
         private void SendCypherQuery(ref string query)

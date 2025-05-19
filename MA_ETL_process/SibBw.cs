@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace MA_ETL_process
 {
-    internal class SibBw
+    internal abstract class SibBw
     {
         public Dictionary<string, string> stringValues = new Dictionary<string, string>();
         public Dictionary<string, string> numberValues = new Dictionary<string, string>();
         public Dictionary<string, string> dateValues = new Dictionary<string, string>();
+
+        public abstract string GetCypherCreate();
 
         protected string GetCypherCreate(
            string cypherIdentifier, string lable, 
@@ -72,7 +74,7 @@ namespace MA_ETL_process
         
         public List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
 
-        public string GetCypherCreate()
+        public override string GetCypherCreate()
         {
             return GetCypherCreate(identifier, static_SibBW_GES_BW.label);
         }
@@ -95,7 +97,7 @@ namespace MA_ETL_process
     {
         public string identifier { get { return ("ID_NR" + stringValues["ID_NR"]).Replace(" ", "_"); } }
 
-        public string GetCypherCreate()
+        public override string GetCypherCreate()
         {
             return GetCypherCreate(identifier, static_SibBW_TEIL_BW.label);
         }
@@ -118,7 +120,7 @@ namespace MA_ETL_process
         public string identifier { get { return ("ID_NR" + stringValues["ID_NR"] + 
                     "_" + numberValues["PRUFJAHR"] + "_" + stringValues["PRUFART"]).Replace(" ", "_"); } }
 
-        public string GetCypherCreate()
+        public override string GetCypherCreate()
         {
             return GetCypherCreate(identifier, static_SibBW_PRUFALT.label);
         }
@@ -157,7 +159,7 @@ namespace MA_ETL_process
             }
         }
 
-        public string GetCypherCreate()
+        public override string GetCypherCreate()
         {
             return GetCypherCreate(identifier, static_SibBW_SCHADALT.label, KeyValuePair.Create("identifierPruf", identifierPruf));
         }
