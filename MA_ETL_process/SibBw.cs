@@ -139,7 +139,7 @@ namespace MA_ETL_process
         }
     }
 
-    internal class SibBW_SCHADFALT : SibBw
+    internal class SibBW_SCHADALT : SibBw
     {
         public string identifier { get {
                 // ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})

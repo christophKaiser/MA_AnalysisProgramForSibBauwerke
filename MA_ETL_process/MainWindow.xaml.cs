@@ -159,7 +159,7 @@ namespace MA_ETL_process
             // Extract PrüfungenAlt from database
             List<SibBW_PRUFALT> PPRUFALTs = sqlClient.SelectRows<SibBW_PRUFALT>(static_SibBW_PRUFALT.sqlQuery(bridgeNumber));
             // Extract SchädenAlt from database
-            List<SibBW_SCHADFALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADFALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
+            List<SibBW_SCHADALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
 
 
             foreach (SibBW_GES_BW ges_bw in GES_BWs)
@@ -195,7 +195,7 @@ namespace MA_ETL_process
             SendCypherQuery(ref query);
             //Utilities.ConsoleLog($"sent {pruefungenAlt_List.Count} CREATE statements in total for PRUFALT");
 
-            foreach (SibBW_SCHADFALT schadAlt in SCHADALTs)
+            foreach (SibBW_SCHADALT schadAlt in SCHADALTs)
             {
                 query += schadAlt.GetCypherCreate() + "\n";
                 if (query.Length > queryMaxLength)
