@@ -340,7 +340,32 @@ namespace MA_ETL_process
             await task;
             buttonsSwitchClickableTo(true);
         }
+        
+        private async void btn_SimplifyBidirectionalRelationships_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
 
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (p1:PRUFALT)-[r:SIMILAR]->(p2:PRUFALT)\r\n" +
+                    "MATCH (p2)-[:SIMILAR]->(p1)\r\n" +
+                    "WHERE elementid(p1) > elementid(p2)\r\n" +
+                    "DELETE r").Consume();
+
+                Utilities.ConsoleLog($"deleted {summary.Counters.RelationshipsDeleted} relationships of the type ':SIMILAR'");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
 
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
         {

@@ -43,6 +43,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateGraphProjection_Click"/>
                 <Button x:Name="btn_NodeSimilarityDamageType" Content="Node Similarity of Damage Types"
                     Style="{StaticResource ButtonStyle}" Click="btn_NodeSimilarityDamageType_Click"/>
+                <Button x:Name="btn_SimplifyBidirectionalRelationships" Content="Simplify Bidirectional Relationships"
+                    Style="{StaticResource ButtonStyle}" Click="btn_SimplifyBidirectionalRelationships_Click"/>
             </WrapPanel>
             <WrapPanel>
                 <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"
