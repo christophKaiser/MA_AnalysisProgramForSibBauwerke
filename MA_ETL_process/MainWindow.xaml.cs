@@ -250,25 +250,14 @@ namespace MA_ETL_process
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
             {
-                neo4jDriver.ExecuteCypherQuery(
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
                     "MATCH (s:SCHADALT)\r\n" +
                     "UNWIND s.SCHADEN AS schadentyp\r\n" +
                     "MERGE (st:SCHADENTYP {typId:schadentyp})\r\n" +
-                    "MERGE (s)-[:istSchadenstyp]->(st)\r\n");
+                    "MERGE (s)-[:istSchadenstyp]->(st)\r\n").Consume();
 
-                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
-                    "CALL{\r\n" +
-                    "    MATCH(st:SCHADENTYP)\r\n" +
-                    "    RETURN count(st) as Schadenstypen\r\n" +
-                    "}\r\n" +
-                    "CALL{\r\n" +
-                    "    MATCH ()-[r:istSchadenstyp]->()\r\n" +
-                    "    RETURN count(r) as istSchadenstyp\r\n" +
-                    "}\r\n" +
-                    "RETURN Schadenstypen, istSchadenstyp").ToList();
-
-                Utilities.ConsoleLog($"The graph contains {records[0]["Schadenstypen"]} nodes of the label ':SCHADENTYP'\n" +
-                    $"The graph contains {records[0]["istSchadenstyp"]} relationships of the type ':istSchadenstyp'");
+                Utilities.ConsoleLog($"created {summary.Counters.NodesCreated} nodes of the label ':SCHADENTYP'\n" +
+                    $"created {summary.Counters.RelationshipsCreated} relationships of the type ':istSchadenstyp'");
             });
 
             await task;
@@ -409,7 +398,7 @@ namespace MA_ETL_process
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
             {
-                neo4jDriver.ExecuteCypherQuery(
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
                     "MATCH (p:PRUFALT)   // get all PRUFALT\r\n" +
                     "CALL(p) {   // execute foreach PRUFALT\r\n" +
                     "  // get all other PRUFALT's into ps which are part of same TEIL_BW\r\n" +
@@ -422,13 +411,9 @@ namespace MA_ETL_process
                     "  MERGE (p)-[:hat_vorherige_prufAlt]->(ps)\r\n" +
                     "  //RETURN collect([p, ps]) as psCollection\r\n" +
                     "}\r\n" +
-                    "//RETURN psCollection\r\n");
+                    "//RETURN psCollection\r\n").Consume();
 
-                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH r=(:PRUFALT)-[:hat_vorherige_prufAlt]->(:PRUFALT)\r\n" +
-                    "RETURN DISTINCT count(r)").ToList();
-
-                Utilities.ConsoleLog($"created {records[0]["count(r)"]} relationships ':hat_vorherige_prufAlt'");
+                Utilities.ConsoleLog($"created {summary.Counters.RelationshipsCreated} relationships ':hat_vorherige_prufAlt'");
             });
 
             await task;
