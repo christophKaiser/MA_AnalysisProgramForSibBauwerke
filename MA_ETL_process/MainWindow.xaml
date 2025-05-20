@@ -32,10 +32,22 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateAllBridges_Click"/>
                 <Button x:Name="btn_CreateRelationshipsAllBridges" Content="Create relationships between all bridges"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateRelationshipsAllBridges_Click"/>
+                <Button x:Name="btn_CreatePropertyNodes" Content="Create Property-Nodes"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreatePropertyNodes_Click"/>
             </WrapPanel>
         </StackPanel>
 
         <StackPanel Grid.Column="1" Grid.Row="0">
+            <WrapPanel>
+                <Button x:Name="btn_CreateGraphProjection" Content="Create Graph Projection"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreateGraphProjection_Click"/>
+                <Button x:Name="btn_NodeSimilarityDamageType" Content="Node Similarity of Damage Types"
+                    Style="{StaticResource ButtonStyle}" Click="btn_NodeSimilarityDamageType_Click"/>
+                <Button x:Name="btn_SimplifyBidirectionalRelationships" Content="Simplify Bidirectional Relationships"
+                    Style="{StaticResource ButtonStyle}" Click="btn_SimplifyBidirectionalRelationships_Click"/>
+                <Button x:Name="btn_MarkRelationshipsInTBW" Content="Mark Relationships Inside Teilbauwerk"
+                    Style="{StaticResource ButtonStyle}" Click="btn_MarkRelationshipsInTBW_Click"/>
+            </WrapPanel>
             <WrapPanel>
                 <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateTimeseries_Click"/>

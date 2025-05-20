@@ -78,6 +78,7 @@ namespace MA_ETL_process
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
             {
+                Utilities.ConsoleLog("creating bridges ...");
                 Stopwatch sw = Stopwatch.StartNew();
 
                 foreach (string bridgeNumber in bridgeNumbers)
@@ -136,7 +137,7 @@ namespace MA_ETL_process
                 // neo4j requires the "CREATE CONSTRAINTS" to be single statements in _session.Run(..)
             }
 
-            Utilities.ConsoleLog("created constriants");
+            Utilities.ConsoleLog("created constraints");
         }
 
         private void extractAndLoadBridge(string bridgeNumber)
@@ -236,6 +237,154 @@ namespace MA_ETL_process
             buttonsSwitchClickableTo(true);
         }
 
+        private async void btn_CreatePropertyNodes_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (s:SCHADALT)\r\n" +
+                    "UNWIND s.SCHADEN AS schadentyp\r\n" +
+                    "MERGE (st:SCHADENTYP {typId:schadentyp})\r\n" +
+                    "MERGE (s)-[:istSchadenstyp]->(st)\r\n").Consume();
+
+                Utilities.ConsoleLog($"created {summary.Counters.NodesCreated} nodes of the label ':SCHADENTYP'\n" +
+                    $"created {summary.Counters.RelationshipsCreated} relationships of the type ':istSchadenstyp'");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
+        private async void btn_CreateGraphProjection_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Utilities.ConsoleLog("creating projection ...");
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (source:PRUFALT)-[]-(s:SCHADALT)-[]-(target:SCHADENTYP)\r\n" +
+                    "WITH source, target\r\n" +
+                    "WITH gds.graph.project(\r\n" +
+                    "    'prufSchadentyp',\r\n" +
+                    "    source,\r\n" +
+                    "    target,\r\n" +
+                    "    '*'\r\n" +
+                    ") AS g\r\n" +
+                    "RETURN g.graphName AS graph, g.nodeCount AS nodes, g.relationshipCount AS rels").ToList();
+
+                Utilities.ConsoleLog($"Created graph projection '{records[0]["graph"]}' " +
+                    $"with {records[0]["nodes"]} nodes and {records[0]["rels"]} relationships");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
+        private async void btn_NodeSimilarityDamageType_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Utilities.ConsoleLog("Executing algorithem of node similarity ...");
+                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
+                    "CALL gds.nodeSimilarity.write(\r\n" +
+                    "  'prufSchadentyp',\r\n" +
+                    "  {\r\n" +
+                    "    similarityCutoff: 0.25,\r\n" +
+                    "    writeRelationshipType: 'SIMILAR',\r\n" +
+                    "    writeProperty: 'similarity_schadensmuster'\r\n" +
+                    "  }\r\n" +
+                    ")\r\n" +
+                    "YIELD nodesCompared, relationshipsWritten, similarityDistribution").ToList();
+
+                Utilities.ConsoleLog($"Node Similarity compared {records[0]["nodesCompared"]} nodes " +
+                    $"and wrote {records[0]["relationshipsWritten"]} relationships ':SIMILAR'");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+        
+        private async void btn_SimplifyBidirectionalRelationships_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (p1:PRUFALT)-[r:SIMILAR]->(p2:PRUFALT)\r\n" +
+                    "MATCH (p2)-[:SIMILAR]->(p1)\r\n" +
+                    "WHERE elementid(p1) > elementid(p2)\r\n" +
+                    "DELETE r").Consume();
+
+                Utilities.ConsoleLog($"deleted {summary.Counters.RelationshipsDeleted} relationships of the type ':SIMILAR'");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
+        private async void btn_MarkRelationshipsInTBW_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (p1)-[s:SIMILAR]->(p2) \r\n" +
+                    "WITH s, CASE\r\n" +
+                    "    WHEN p1.ID_NR = p2.ID_NR THEN false \r\n" +
+                    "    ELSE true\r\n" +
+                    "END AS aTBw\r\n" +
+                    "SET s.anderesTeilbauwerk = aTBw").Consume();
+
+                Utilities.ConsoleLog($"set {summary.Counters.PropertiesSet} properties 'anderesTeilbauwerk: true | false' " +
+                    $"on relationships of the type ':SIMILAR'");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)
@@ -249,7 +398,7 @@ namespace MA_ETL_process
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
             {
-                neo4jDriver.ExecuteCypherQuery(
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
                     "MATCH (p:PRUFALT)   // get all PRUFALT\r\n" +
                     "CALL(p) {   // execute foreach PRUFALT\r\n" +
                     "  // get all other PRUFALT's into ps which are part of same TEIL_BW\r\n" +
@@ -262,13 +411,9 @@ namespace MA_ETL_process
                     "  MERGE (p)-[:hat_vorherige_prufAlt]->(ps)\r\n" +
                     "  //RETURN collect([p, ps]) as psCollection\r\n" +
                     "}\r\n" +
-                    "//RETURN psCollection\r\n");
+                    "//RETURN psCollection\r\n").Consume();
 
-                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH r=(:PRUFALT)-[:hat_vorherige_prufAlt]->(:PRUFALT)\r\n" +
-                    "RETURN DISTINCT count(r)").ToList();
-
-                Utilities.ConsoleLog($"created {records[0]["count(r)"]} relationships ':hat_vorherige_prufAlt'");
+                Utilities.ConsoleLog($"created {summary.Counters.RelationshipsCreated} relationships ':hat_vorherige_prufAlt'");
             });
 
             await task;
