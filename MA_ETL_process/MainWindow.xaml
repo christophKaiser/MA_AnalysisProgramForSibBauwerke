@@ -45,6 +45,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_NodeSimilarityDamageType_Click"/>
                 <Button x:Name="btn_SimplifyBidirectionalRelationships" Content="Simplify Bidirectional Relationships"
                     Style="{StaticResource ButtonStyle}" Click="btn_SimplifyBidirectionalRelationships_Click"/>
+                <Button x:Name="btn_MarkRelationshipsInTBW" Content="Mark Relationships Inside Teilbauwerk"
+                    Style="{StaticResource ButtonStyle}" Click="btn_MarkRelationshipsInTBW_Click"/>
             </WrapPanel>
             <WrapPanel>
                 <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"

@@ -367,6 +367,35 @@ namespace MA_ETL_process
             buttonsSwitchClickableTo(true);
         }
 
+        private async void btn_MarkRelationshipsInTBW_Click(object sender, RoutedEventArgs e)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
+                    "MATCH (p1)-[s:SIMILAR]->(p2) \r\n" +
+                    "WITH s, CASE\r\n" +
+                    "    WHEN p1.ID_NR = p2.ID_NR THEN false \r\n" +
+                    "    ELSE true\r\n" +
+                    "END AS aTBw\r\n" +
+                    "SET s.anderesTeilbauwerk = aTBw").Consume();
+
+                Utilities.ConsoleLog($"set {summary.Counters.PropertiesSet} properties 'anderesTeilbauwerk: true | false' " +
+                    $"on relationships of the type ':SIMILAR'");
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
         private async void btn_CreateTimeseries_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)
