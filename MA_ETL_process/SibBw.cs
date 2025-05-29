@@ -18,6 +18,7 @@ namespace MA_ETL_process
            string cypherIdentifier, string label, 
            KeyValuePair<string, string> cypherIdentifierCustom = new KeyValuePair<string, string>())
         {
+            // example query from neo4j-docs to get the syntax
             // CREATE (a:Person {name:'Brie Larson', born:1989})
             // initialize CREATE
             string cypher = $"CREATE (:{label} {{";
@@ -25,6 +26,7 @@ namespace MA_ETL_process
             // add identifier as required property
             cypher += $"identifier:'{cypherIdentifier}', ";
 
+            // if existing, add secondary custom identifier; e.g. SCHADALT gets an identifier of the corresponding PRUFALT
             if (cypherIdentifierCustom.Key != null)
             {
                 cypher += $"{cypherIdentifierCustom.Key}:'{cypherIdentifierCustom.Value}', ";
