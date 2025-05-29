@@ -224,7 +224,7 @@ namespace MA_ETL_process
                 Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
                     $"from {static_SibBW_TEIL_BW.label} to {static_SibBW_PRUFALT.label}");
 
-                var z = neo4jDriver.ExecuteCypherQuery(static_SibBW_PRUFALT.GetCypherMergeToSCHADALT()).ToList();
+                records = neo4jDriver.ExecuteCypherQuery(static_SibBW_PRUFALT.GetCypherMergeToSCHADALT()).ToList();
                 Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
                     $"from {static_SibBW_PRUFALT.label} to {static_SibBW_SCHADALT.label}");
 
