@@ -13,7 +13,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="140"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Column="0" Grid.Row="0">
@@ -34,6 +34,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateRelationshipsAllBridges_Click"/>
                 <Button x:Name="btn_CreatePropertyNodes" Content="Create Property-Nodes"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreatePropertyNodes_Click"/>
+                <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"
+                    Style="{StaticResource ButtonStyle}" Click="btn_CreateTimeseries_Click"/>
             </WrapPanel>
         </StackPanel>
 
@@ -47,10 +49,6 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_SimplifyBidirectionalRelationships_Click"/>
                 <Button x:Name="btn_MarkRelationshipsInTBW" Content="Mark Relationships Inside Teilbauwerk"
                     Style="{StaticResource ButtonStyle}" Click="btn_MarkRelationshipsInTBW_Click"/>
-            </WrapPanel>
-            <WrapPanel>
-                <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"
-                    Style="{StaticResource ButtonStyle}" Click="btn_CreateTimeseries_Click"/>
             </WrapPanel>
         </StackPanel>
 
