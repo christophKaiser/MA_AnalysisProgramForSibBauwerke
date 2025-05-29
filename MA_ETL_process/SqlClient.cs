@@ -61,9 +61,10 @@ namespace MA_ETL_process
                             case "char":
                             case "varchar":
                             default: // not handled above (default) is same as string
-                                // add to stringValues: use fild name by GetName(i);
-                                // null-check 'reader[i].ToString()' by '??' (null-coalescing operator), if null then use empty string ""
-                                sibBw.stringValues.Add(reader.GetName(i), reader[i].ToString() ?? "");
+                                // add to stringValues: use field name by GetName(i);
+                                // null-check 'reader[i].ToString()' by '??' (null-coalescing operator), if null then use empty string "";
+                                // .TrimEnd() // removes all whitespaces at the end of the string
+                                sibBw.stringValues.Add(reader.GetName(i), (reader[i].ToString() ?? "").TrimEnd());
                                 break;
                         }
 

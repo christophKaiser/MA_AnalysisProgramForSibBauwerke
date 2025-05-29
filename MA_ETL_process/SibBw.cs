@@ -44,7 +44,7 @@ namespace MA_ETL_process
                 cypher += $"{kvp.Key}:'{kvp.Value.Replace("'", "\\'")}', ";
                 //...Replace("'", "\\'")  - adds one backslash before apostrophes inside the string
                 //                       to mark them as part of the string and not as end of string
-                //kvp.Value.TrimEnd() // removes all whitespaces at the end of the string
+                //kvp.Value.TrimEnd() // removes all whitespaces at the end of the string (already done in SqlClient)
             }
 
             // add dateValues as properties
