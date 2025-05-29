@@ -15,12 +15,12 @@ namespace MA_ETL_process
         public abstract string GetCypherCreate();
 
         protected string GetCypherCreate(
-           string cypherIdentifier, string lable, 
+           string cypherIdentifier, string label, 
            KeyValuePair<string, string> cypherIdentifierCustom = new KeyValuePair<string, string>())
         {
             // CREATE (a:Person {name:'Brie Larson', born:1989})
             // initialize CREATE
-            string cypher = $"CREATE (:{lable} {{";
+            string cypher = $"CREATE (:{label} {{";
 
             // add identifier as required property
             cypher += $"identifier:'{cypherIdentifier}', ";
