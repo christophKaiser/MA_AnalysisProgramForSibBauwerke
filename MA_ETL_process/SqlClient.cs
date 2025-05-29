@@ -47,11 +47,11 @@ namespace MA_ETL_process
                         switch (type)
                         {
                             case "decimal":
-                                // get value from reader, convert to string, check if null then use "" (?? is null-coalescing operator)
-                                value = reader[i].ToString() ?? "";
-                                // add key-value-pair: use "-1" if value is empty (conditional operator),
+                                // get value from reader, convert to string, check if null then use "-1" (?? is null-coalescing operator)
+                                value = reader[i].ToString() ?? "-1";
+                                // add key-value-pair:
                                 // replace decimal separator "," by "." (by default, the thousend separator doesn't occure in ToString())
-                                sibBw.numberValues.Add(reader.GetName(i),  ((value != "") ? value : "-1").Replace(",","."));
+                                sibBw.numberValues.Add(reader.GetName(i),  value.Replace(",","."));
                                 break;
                             case "datetime":
                                 // get value from reader, convert to datetime, convert to formated string
