@@ -316,14 +316,14 @@ namespace MA_ETL_process
                     "  'prufSchadentyp',\r\n" +
                     "  {\r\n" +
                     "    similarityCutoff: 0.25,\r\n" +
-                    "    writeRelationshipType: 'SIMILAR',\r\n" +
+                    "    writeRelationshipType: 'similar',\r\n" +
                     "    writeProperty: 'similarity_schadensmuster'\r\n" +
                     "  }\r\n" +
                     ")\r\n" +
                     "YIELD nodesCompared, relationshipsWritten, similarityDistribution").ToList();
 
                 Utilities.ConsoleLog($"Node Similarity compared {records[0]["nodesCompared"]} nodes " +
-                    $"and wrote {records[0]["relationshipsWritten"]} relationships ':SIMILAR'");
+                    $"and wrote {records[0]["relationshipsWritten"]} relationships ':similar'");
             });
 
             await task;
@@ -344,12 +344,12 @@ namespace MA_ETL_process
             Task task = Task.Run(() =>
             {
                 Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH (p1:PRUFALT)-[r:SIMILAR]->(p2:PRUFALT)\r\n" +
-                    "MATCH (p2)-[:SIMILAR]->(p1)\r\n" +
+                    "MATCH (p1:PRUFALT)-[r:similar]->(p2:PRUFALT)\r\n" +
+                    "MATCH (p2)-[:similar]->(p1)\r\n" +
                     "WHERE elementid(p1) > elementid(p2)\r\n" +
                     "DELETE r").Consume();
 
-                Utilities.ConsoleLog($"deleted {summary.Counters.RelationshipsDeleted} relationships of the type ':SIMILAR'");
+                Utilities.ConsoleLog($"deleted {summary.Counters.RelationshipsDeleted} relationships of the type ':similar'");
             });
 
             await task;
@@ -370,7 +370,7 @@ namespace MA_ETL_process
             Task task = Task.Run(() =>
             {
                 Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
-                    "MATCH (p1)-[s:SIMILAR]->(p2) \r\n" +
+                    "MATCH (p1)-[s:similar]->(p2) \r\n" +
                     "WITH s, CASE\r\n" +
                     "    WHEN p1.ID_NR = p2.ID_NR THEN false \r\n" +
                     "    ELSE true\r\n" +
@@ -378,7 +378,7 @@ namespace MA_ETL_process
                     "SET s.anderesTeilbauwerk = aTBw").Consume();
 
                 Utilities.ConsoleLog($"set {summary.Counters.PropertiesSet} properties 'anderesTeilbauwerk: true | false' " +
-                    $"on relationships of the type ':SIMILAR'");
+                    $"on relationships of the type ':similar'");
             });
 
             await task;
