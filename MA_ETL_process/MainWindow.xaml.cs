@@ -72,8 +72,8 @@ namespace MA_ETL_process
 
             buttonsSwitchClickableTo(false);
 
-            List<string> bridgeNumbers = getBridgeNumbers();
             createConstraints();
+            List<string> bridgeNumbers = getBridgeNumbers();
 
             // start new thread beside the UI-thread (which the button would use)
             Task task = Task.Run(() =>
