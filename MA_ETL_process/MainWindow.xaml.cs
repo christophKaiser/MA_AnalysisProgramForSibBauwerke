@@ -90,6 +90,9 @@ namespace MA_ETL_process
                 Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
 
                 Utilities.ConsoleLog("'Create all bridges' finished");
+
+                Utilities.ConsoleLog("creating relationships ...");
+                createRelationshipsAllBridges();
             });
 
             await task;
@@ -201,7 +204,7 @@ namespace MA_ETL_process
             }
         }
 
-        private async void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)
+        private void createRelationshipsAllBridges()
         {
             if (neo4jDriver == null)
             {
@@ -209,32 +212,23 @@ namespace MA_ETL_process
                 return;
             }
 
-            buttonsSwitchClickableTo(false);
+            Stopwatch sw = Stopwatch.StartNew();
 
-            // start new thread beside the UI-thread (which the button would use)
-            Task task = Task.Run(() =>
-            {
-                Stopwatch sw = Stopwatch.StartNew();
+            List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(static_SibBW_GES_BW.GetCypherMergeToTeilBW()).ToList();
+            Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                $"from {static_SibBW_GES_BW.label} to {static_SibBW_TEIL_BW.label}");
 
-                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(static_SibBW_GES_BW.GetCypherMergeToTeilBW()).ToList();
-                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
-                    $"from {static_SibBW_GES_BW.label} to {static_SibBW_TEIL_BW.label}");
+            records = neo4jDriver.ExecuteCypherQuery(static_SibBW_TEIL_BW.GetCypherMergeToPRUFALT()).ToList();
+            Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                $"from {static_SibBW_TEIL_BW.label} to {static_SibBW_PRUFALT.label}");
 
-                records = neo4jDriver.ExecuteCypherQuery(static_SibBW_TEIL_BW.GetCypherMergeToPRUFALT()).ToList();
-                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
-                    $"from {static_SibBW_TEIL_BW.label} to {static_SibBW_PRUFALT.label}");
+            records = neo4jDriver.ExecuteCypherQuery(static_SibBW_PRUFALT.GetCypherMergeToSCHADALT()).ToList();
+            Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                $"from {static_SibBW_PRUFALT.label} to {static_SibBW_SCHADALT.label}");
 
-                records = neo4jDriver.ExecuteCypherQuery(static_SibBW_PRUFALT.GetCypherMergeToSCHADALT()).ToList();
-                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
-                    $"from {static_SibBW_PRUFALT.label} to {static_SibBW_SCHADALT.label}");
-
-                sw.Stop();
+            sw.Stop();
             
-                Utilities.ConsoleLog($"all relationships created in time {sw.Elapsed}");
-            });
-
-            await task;
-            buttonsSwitchClickableTo(true);
+            Utilities.ConsoleLog($"all relationships created in time {sw.Elapsed}");
         }
 
         private async void btn_CreatePropertyNodes_Click(object sender, RoutedEventArgs e)

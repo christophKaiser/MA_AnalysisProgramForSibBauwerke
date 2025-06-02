@@ -28,10 +28,8 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_Neo4jDeleteNodes_Click"/>
             </WrapPanel>
             <WrapPanel>
-                <Button x:Name="btn_CreateAllBridges" Content="Create all bridges without relationships"
+                <Button x:Name="btn_CreateAllBridges" Content="Create all bridges with relationships"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreateAllBridges_Click"/>
-                <Button x:Name="btn_CreateRelationshipsAllBridges" Content="Create relationships between all bridges"
-                    Style="{StaticResource ButtonStyle}" Click="btn_CreateRelationshipsAllBridges_Click"/>
                 <Button x:Name="btn_CreatePropertyNodes" Content="Create Property-Nodes"
                     Style="{StaticResource ButtonStyle}" Click="btn_CreatePropertyNodes_Click"/>
                 <Button x:Name="btn_CreateTimeseries" Content="Create Time Series of Inspections"
