@@ -11,6 +11,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Windows.Threading;
+using System.IO;
 
 namespace MA_ETL_process
 {
@@ -252,10 +253,34 @@ namespace MA_ETL_process
 
                 Utilities.ConsoleLog($"created {summary.Counters.NodesCreated} nodes of the label ':SCHADENTYP'\n" +
                     $"created {summary.Counters.RelationshipsCreated} relationships of the type ':istSchadenstyp'");
+
+                writePropertiesToSCHADENTYP();
             });
 
             await task;
             buttonsSwitchClickableTo(true);
+        }
+
+        private void writePropertiesToSCHADENTYP()
+        {
+            Utilities.ConsoleLog("started to enrich ':SCHADENTYP' nodes with more information ...");
+
+            using (var reader = new StreamReader(LoginCredentials.CsvSchadentypPath))
+            {
+                // ToDo: customise data storage
+                List<string> listA = new List<string>();
+                List<string> listB = new List<string>();
+
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(';');
+
+                    // ToDo: customise data storage
+                    listA.Add(values[0]);
+                    listB.Add(values[1]);
+                }
+            }
         }
 
         private async void btn_CreateGraphProjection_Click(object sender, RoutedEventArgs e)
