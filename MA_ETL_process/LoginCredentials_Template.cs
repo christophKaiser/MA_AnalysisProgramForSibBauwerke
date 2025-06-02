@@ -22,5 +22,9 @@ namespace MA_ETL_process
         public static string Neo4jUser = "<user>";
         public static string Neo4jPassword = "<password>";
         public static string Neo4jDatabase = "<database>";
+
+        public static string CsvSchadentypPath = @"C:\\<path>\\<filename>.csv";
+        // csv of the SCHADEN (aka Schadentyp) must be in the format
+        // nr;text;drk_text;;nr_withZeros;Level;Text-Baum
     }
 }

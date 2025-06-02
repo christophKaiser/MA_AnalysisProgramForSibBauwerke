@@ -11,6 +11,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Windows.Threading;
+using System.IO;
 
 namespace MA_ETL_process
 {
@@ -23,6 +24,7 @@ namespace MA_ETL_process
         Neo4jDriver? neo4jDriver = null;
         int queryMaxLength = 100000;
         string query = "";
+        Dictionary<string, string> asbIng_key_name = [];
 
         public MainWindow()
         {
@@ -90,6 +92,9 @@ namespace MA_ETL_process
                 Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
 
                 Utilities.ConsoleLog("'Create all bridges' finished");
+
+                Utilities.ConsoleLog("creating relationships ...");
+                createRelationshipsAllBridges();
             });
 
             await task;
@@ -201,7 +206,7 @@ namespace MA_ETL_process
             }
         }
 
-        private async void btn_CreateRelationshipsAllBridges_Click(object sender, RoutedEventArgs e)
+        private void createRelationshipsAllBridges()
         {
             if (neo4jDriver == null)
             {
@@ -209,32 +214,23 @@ namespace MA_ETL_process
                 return;
             }
 
-            buttonsSwitchClickableTo(false);
+            Stopwatch sw = Stopwatch.StartNew();
 
-            // start new thread beside the UI-thread (which the button would use)
-            Task task = Task.Run(() =>
-            {
-                Stopwatch sw = Stopwatch.StartNew();
+            List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(static_SibBW_GES_BW.GetCypherMergeToTeilBW()).ToList();
+            Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                $"from {static_SibBW_GES_BW.label} to {static_SibBW_TEIL_BW.label}");
 
-                List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(static_SibBW_GES_BW.GetCypherMergeToTeilBW()).ToList();
-                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
-                    $"from {static_SibBW_GES_BW.label} to {static_SibBW_TEIL_BW.label}");
+            records = neo4jDriver.ExecuteCypherQuery(static_SibBW_TEIL_BW.GetCypherMergeToPRUFALT()).ToList();
+            Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                $"from {static_SibBW_TEIL_BW.label} to {static_SibBW_PRUFALT.label}");
 
-                records = neo4jDriver.ExecuteCypherQuery(static_SibBW_TEIL_BW.GetCypherMergeToPRUFALT()).ToList();
-                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
-                    $"from {static_SibBW_TEIL_BW.label} to {static_SibBW_PRUFALT.label}");
+            records = neo4jDriver.ExecuteCypherQuery(static_SibBW_PRUFALT.GetCypherMergeToSCHADALT()).ToList();
+            Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
+                $"from {static_SibBW_PRUFALT.label} to {static_SibBW_SCHADALT.label}");
 
-                records = neo4jDriver.ExecuteCypherQuery(static_SibBW_PRUFALT.GetCypherMergeToSCHADALT()).ToList();
-                Utilities.ConsoleLog($"{records[0]["count(r)"]} relationships created " +
-                    $"from {static_SibBW_PRUFALT.label} to {static_SibBW_SCHADALT.label}");
-
-                sw.Stop();
+            sw.Stop();
             
-                Utilities.ConsoleLog($"all relationships created in time {sw.Elapsed}");
-            });
-
-            await task;
-            buttonsSwitchClickableTo(true);
+            Utilities.ConsoleLog($"all relationships created in time {sw.Elapsed}");
         }
 
         private async void btn_CreatePropertyNodes_Click(object sender, RoutedEventArgs e)
@@ -258,10 +254,77 @@ namespace MA_ETL_process
 
                 Utilities.ConsoleLog($"created {summary.Counters.NodesCreated} nodes of the label ':SCHADENTYP'\n" +
                     $"created {summary.Counters.RelationshipsCreated} relationships of the type ':istSchadenstyp'");
+
+                writePropertiesToSCHADENTYP();
             });
 
             await task;
             buttonsSwitchClickableTo(true);
+        }
+
+        private void btn_TestCsv_Click(object sender, RoutedEventArgs e)
+        {
+            writePropertiesToSCHADENTYP();
+        }
+
+        private void writePropertiesToSCHADENTYP()
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            Utilities.ConsoleLog("started to enrich ':SCHADENTYP' nodes with more information ...");
+
+            // load schadentyp names from csv
+            asbIng_key_name = loadAsbIng_KeysAndNameFromCsv();
+
+            // get all SCHADENTYP nodes
+            List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
+                "MATCH(st:SCHADENTYP)\r\n" +
+                "RETURN st.typId").ToList();
+
+            int counterPropertiesSet = 0;
+
+            foreach(Neo4j.Driver.IRecord record in records)
+            {
+                // get typId from node and its name from the key-name-mapping of ASB-ING
+                string typId = record["st.typId"].ToString() ?? "";
+                string name = asbIng_key_name[typId];
+
+                // set property to node in graph
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
+                    $"MATCH(st:SCHADENTYP {{typId: {typId}}})\r\n" +
+                    $"SET st.name = '{name}'").Consume();
+
+                counterPropertiesSet += summary.Counters.PropertiesSet;
+            }
+
+            Utilities.ConsoleLog($"worte {counterPropertiesSet} properties ':SCHADENTYP.name'");
+        }
+
+        Dictionary<string, string> loadAsbIng_KeysAndNameFromCsv()
+        {
+            using (var reader = new StreamReader(LoginCredentials.CsvSchadentypPath))
+            {
+                // initialize result variable
+                Dictionary<string, string> asbIng_key_name = new Dictionary<string, string>();
+
+                // skip first line (header) of csv
+                reader.ReadLine();
+
+                while (!reader.EndOfStream)
+                {
+                    string? line = reader.ReadLine();
+                    if (line == null) { continue; }
+                    string[] values = line.Split(';');
+
+                    // schadentypID (nr), and its full name (drk_text)
+                    asbIng_key_name.Add(values[0], values[2]);
+                }
+                return asbIng_key_name;
+            }
         }
 
         private async void btn_CreateGraphProjection_Click(object sender, RoutedEventArgs e)
