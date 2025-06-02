@@ -274,6 +274,7 @@ namespace MA_ETL_process
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
+                    if (line == null) { continue; }
                     var values = line.Split(';');
 
                     // ToDo: customise data storage
