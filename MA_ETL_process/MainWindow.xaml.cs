@@ -261,6 +261,11 @@ namespace MA_ETL_process
             buttonsSwitchClickableTo(true);
         }
 
+        private void btn_TestCsv_Click(object sender, RoutedEventArgs e)
+        {
+            writePropertiesToSCHADENTYP();
+        }
+
         private void writePropertiesToSCHADENTYP()
         {
             Utilities.ConsoleLog("started to enrich ':SCHADENTYP' nodes with more information ...");
