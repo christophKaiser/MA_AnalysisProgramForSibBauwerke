@@ -270,22 +270,29 @@ namespace MA_ETL_process
         {
             Utilities.ConsoleLog("started to enrich ':SCHADENTYP' nodes with more information ...");
 
+            Dictionary<string, string> schadentypID_name = loadSchadIdAndNameFromCsv();
+        }
+
+        Dictionary<string, string> loadSchadIdAndNameFromCsv()
+        {
             using (var reader = new StreamReader(LoginCredentials.CsvSchadentypPath))
             {
-                // ToDo: customise data storage
-                List<string> listA = new List<string>();
-                List<string> listB = new List<string>();
+                // initialize result variable
+                Dictionary<string, string> schadentypID_name = new Dictionary<string, string>();
+
+                // skip first line (header) of csv
+                reader.ReadLine();
 
                 while (!reader.EndOfStream)
                 {
-                    var line = reader.ReadLine();
+                    string? line = reader.ReadLine();
                     if (line == null) { continue; }
-                    var values = line.Split(';');
+                    string[] values = line.Split(';');
 
-                    // ToDo: customise data storage
-                    listA.Add(values[0]);
-                    listB.Add(values[1]);
+                    // schadentypID (with leading zeros), and its full name (drk_text)
+                    schadentypID_name.Add(values[4], values[2]);
                 }
+                return schadentypID_name;
             }
         }
 

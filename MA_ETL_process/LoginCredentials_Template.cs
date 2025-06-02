@@ -25,6 +25,6 @@ namespace MA_ETL_process
 
         public static string CsvSchadentypPath = @"C:\\<path>\\<filename>.csv";
         // csv of the SCHADEN (aka Schadentyp) must be in the format
-        // nr;text;drk_text;;;Level;Text-Baum
+        // nr;text;drk_text;;nr_withZeros;Level;Text-Baum
     }
 }
