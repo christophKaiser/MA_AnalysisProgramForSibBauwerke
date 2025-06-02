@@ -24,6 +24,7 @@ namespace MA_ETL_process
         Neo4jDriver? neo4jDriver = null;
         int queryMaxLength = 100000;
         string query = "";
+        Dictionary<string, string> asbIng_key_name = [];
 
         public MainWindow()
         {
@@ -268,17 +269,47 @@ namespace MA_ETL_process
 
         private void writePropertiesToSCHADENTYP()
         {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
             Utilities.ConsoleLog("started to enrich ':SCHADENTYP' nodes with more information ...");
 
-            Dictionary<string, string> schadentypID_name = loadSchadIdAndNameFromCsv();
+            // load schadentyp names from csv
+            asbIng_key_name = loadAsbIng_KeysAndNameFromCsv();
+
+            // get all SCHADENTYP nodes
+            List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
+                "MATCH(st:SCHADENTYP)\r\n" +
+                "RETURN st.typId").ToList();
+
+            int counterPropertiesSet = 0;
+
+            foreach(Neo4j.Driver.IRecord record in records)
+            {
+                // get typId from node and its name from the key-name-mapping of ASB-ING
+                string typId = record["st.typId"].ToString() ?? "";
+                string name = asbIng_key_name[typId];
+
+                // set property to node in graph
+                Neo4j.Driver.IResultSummary summary = neo4jDriver.ExecuteCypherQuery(
+                    $"MATCH(st:SCHADENTYP {{typId: {typId}}})\r\n" +
+                    $"SET st.name = '{name}'").Consume();
+
+                counterPropertiesSet += summary.Counters.PropertiesSet;
+            }
+
+            Utilities.ConsoleLog($"worte {counterPropertiesSet} properties ':SCHADENTYP.name'");
         }
 
-        Dictionary<string, string> loadSchadIdAndNameFromCsv()
+        Dictionary<string, string> loadAsbIng_KeysAndNameFromCsv()
         {
             using (var reader = new StreamReader(LoginCredentials.CsvSchadentypPath))
             {
                 // initialize result variable
-                Dictionary<string, string> schadentypID_name = new Dictionary<string, string>();
+                Dictionary<string, string> asbIng_key_name = new Dictionary<string, string>();
 
                 // skip first line (header) of csv
                 reader.ReadLine();
@@ -289,10 +320,10 @@ namespace MA_ETL_process
                     if (line == null) { continue; }
                     string[] values = line.Split(';');
 
-                    // schadentypID (with leading zeros), and its full name (drk_text)
-                    schadentypID_name.Add(values[4], values[2]);
+                    // schadentypID (nr), and its full name (drk_text)
+                    asbIng_key_name.Add(values[0], values[2]);
                 }
-                return schadentypID_name;
+                return asbIng_key_name;
             }
         }
 
