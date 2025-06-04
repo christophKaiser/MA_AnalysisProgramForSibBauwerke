@@ -24,7 +24,7 @@ namespace MA_ETL_process
         public static string Neo4jDatabase = "<database>";
 
         public static string CsvSchadentypPath = @"C:\\<path>\\<filename>.csv";
-        // csv of the SCHADEN (aka Schadentyp) must be in the format
+        // csv of the asbing-keys must be in the format
         // nr;text;drk_text;;nr_withZeros;Level;Text-Baum
     }
 }

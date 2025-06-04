@@ -255,6 +255,7 @@ namespace MA_ETL_process
                 Utilities.ConsoleLog($"created {summary.Counters.NodesCreated} nodes of the label ':SCHADENTYP'\n" +
                     $"created {summary.Counters.RelationshipsCreated} relationships of the type ':istSchadenstyp'");
 
+                // write the textual property of the schadenstyp from the ASB-ING-Key-list
                 writePropertiesToSCHADENTYP();
             });
 
@@ -277,7 +278,7 @@ namespace MA_ETL_process
 
             Utilities.ConsoleLog("started to enrich ':SCHADENTYP' nodes with more information ...");
 
-            // load schadentyp names from csv
+            // load schadentyp names from csv into class property
             asbIng_key_name = loadAsbIng_KeysAndNameFromCsv();
 
             // get all SCHADENTYP nodes
@@ -286,7 +287,6 @@ namespace MA_ETL_process
                 "RETURN st.typId").ToList();
 
             int counterPropertiesSet = 0;
-
             foreach(Neo4j.Driver.IRecord record in records)
             {
                 // get typId from node and its name from the key-name-mapping of ASB-ING
