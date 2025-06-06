@@ -91,10 +91,10 @@ namespace MA_ETL_process
                 sw.Stop();
                 Utilities.ConsoleLog($"created neo4j nodes in time '{sw.Elapsed}', no relationships created");
 
-                Utilities.ConsoleLog("'Create all bridges' finished");
-
                 Utilities.ConsoleLog("creating relationships ...");
                 createRelationshipsAllBridges();
+
+                Utilities.ConsoleLog("'Create all bridges' finished");
             });
 
             await task;
