@@ -66,7 +66,7 @@ namespace MA_ETL_process
         public static string GetCypherConstraintKey(string label)
         {
             // CREATE CONSTRAINT constraint_name FOR (n:Label) REQUIRE n.property IS NODE KEY
-            return $"CREATE CONSTRAINT keyConstraint_{label} FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
+            return $"CREATE CONSTRAINT keyConstraint_{label} IF NOT EXISTS FOR (n:{label}) REQUIRE (n.identifier) IS NODE KEY";
         }
     }
 
