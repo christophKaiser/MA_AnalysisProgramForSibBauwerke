@@ -73,8 +73,6 @@ namespace MA_ETL_process
     internal class SibBW_GES_BW : SibBw
     {
         public string identifier { get { return ("BWNR" + stringValues["BWNR"]).Replace(" ", "_"); } }
-        
-        public List<SibBW_TEIL_BW> teilbauwerke = new List<SibBW_TEIL_BW>();
 
         public override string GetCypherCreate()
         {
