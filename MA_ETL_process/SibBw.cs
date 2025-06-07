@@ -54,7 +54,7 @@ namespace MA_ETL_process
             }
 
             // remove last ", " in the cypher-string
-            cypher = cypher.Remove(cypher.Length - 2, 1) ;
+            cypher = cypher.Remove(cypher.Length - 2, 1);
 
             // close properties-parenthes and CREATE-parenthesis; return string
             return cypher += "})";
