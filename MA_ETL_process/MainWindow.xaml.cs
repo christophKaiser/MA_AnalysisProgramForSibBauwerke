@@ -301,7 +301,7 @@ namespace MA_ETL_process
                 counterPropertiesSet += summary.Counters.PropertiesSet;
             }
 
-            Utilities.ConsoleLog($"worte {counterPropertiesSet} properties ':SCHADENTYP.name'");
+            Utilities.ConsoleLog($"wrote {counterPropertiesSet} properties ':SCHADENTYP.name'");
         }
 
         Dictionary<string, string> loadAsbIng_KeysAndNameFromCsv()
