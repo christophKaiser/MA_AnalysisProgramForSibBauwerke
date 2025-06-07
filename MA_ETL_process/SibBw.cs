@@ -83,7 +83,7 @@ namespace MA_ETL_process
     internal static class static_SibBW_GES_BW
     {
         public static string label = "GES_BW";
-        public static string sqlQuery(string bridgeNumber)
+        public static string GetSqlQuery(string bridgeNumber)
         {
             // ... SELECT TOP (100) [BWNR], ...
             return "SELECT [BWNR], [BWNAME], [LAENGE_BR]\n" +
@@ -113,7 +113,7 @@ namespace MA_ETL_process
     internal static class static_SibBW_TEIL_BW
     {
         public static string label = "TEIL_BW";
-        public static string sqlQuery(string bridgeNumber)
+        public static string GetSqlQuery(string bridgeNumber)
         {
             return "SELECT [BWNR], [TEIL_BWNR], [ID_NR], [TW_NAME], [KONSTRUKT], [STADIUM]\n" +
                 "FROM [SIB_BAUWERKE_19_20230427].[dbo].[TEIL_BW]\n" +
@@ -143,7 +143,7 @@ namespace MA_ETL_process
     internal static class static_SibBW_PRUFALT
     {
         public static string label = "PRUFALT";
-        public static string sqlQuery(string bridgeNumber)
+        public static string GetSqlQuery(string bridgeNumber)
         {
             // all DB-entries: "SELECT [ID_NR], [BWNR], [TEIL_BWNR], [IBWNR], [AMT], [PRUFART], [PRUFJAHR], [DIENSTSTEL], [PRUEFER], "[PRUFDAT1], [PRUFDAT2], [PRUFRICHT], [PRUFTEXT], [UBERDAT], [BEARBDAT], [ER_ZUSTAND], [ZS_MINTRAG], [FESTLEGTXT], "[MASSNAHME], [IDENT], [MAX_S], [MAX_V], [MAX_D], [DAT_NAE_H], [ART_NAE_H], [DAT_NAE_S], [DAT_NAE_E]"
             // first selection: [ID_NR], [BWNR], [TEIL_BWNR], [AMT], [PRUFART], [PRUFJAHR], [PRUFDAT1], [PRUFDAT2], [ER_ZUSTAND], [ZS_MINTRAG], [IDENT], [MAX_S], [MAX_V], [MAX_D]
@@ -189,7 +189,7 @@ namespace MA_ETL_process
     internal static class static_SibBW_SCHADALT
     {
         public static string label = "SCHADALT";
-        public static string sqlQuery(string bridgeNumber)
+        public static string GetSqlQuery(string bridgeNumber)
         {
             // SchadenAlt hängt an Prüfung via ID_NR, PRUFJAHR, PRA (=Prüfart: {E, H})
             // zur eindeutige Identifizierung des Schadens: LFDNR und SCHAD_ID sind nicht konsistent; Bedeutung IDENT ist unklar

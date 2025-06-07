@@ -160,13 +160,13 @@ namespace MA_ETL_process
 
             // Extract Bauwerk from database
             // GES_BWs will only have one entry due to the outer foreach, but still uses the same functions as the other tables
-            List<SibBW_GES_BW> GES_BWs = sqlClient.SelectRows<SibBW_GES_BW>(static_SibBW_GES_BW.sqlQuery(bridgeNumber));
+            List<SibBW_GES_BW> GES_BWs = sqlClient.SelectRows<SibBW_GES_BW>(static_SibBW_GES_BW.GetSqlQuery(bridgeNumber));
             // Extract Teilbauwerke from database
-            List<SibBW_TEIL_BW> TEIL_BWs = sqlClient.SelectRows<SibBW_TEIL_BW>(static_SibBW_TEIL_BW.sqlQuery(bridgeNumber));
+            List<SibBW_TEIL_BW> TEIL_BWs = sqlClient.SelectRows<SibBW_TEIL_BW>(static_SibBW_TEIL_BW.GetSqlQuery(bridgeNumber));
             // Extract PrüfungenAlt from database
-            List<SibBW_PRUFALT> PRUFALTs = sqlClient.SelectRows<SibBW_PRUFALT>(static_SibBW_PRUFALT.sqlQuery(bridgeNumber));
+            List<SibBW_PRUFALT> PRUFALTs = sqlClient.SelectRows<SibBW_PRUFALT>(static_SibBW_PRUFALT.GetSqlQuery(bridgeNumber));
             // Extract SchädenAlt from database
-            List<SibBW_SCHADALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADALT>(static_SibBW_SCHADALT.sqlQuery(bridgeNumber));
+            List<SibBW_SCHADALT> SCHADALTs = sqlClient.SelectRows<SibBW_SCHADALT>(static_SibBW_SCHADALT.GetSqlQuery(bridgeNumber));
 
             // potential data preparation goes here aka. 'staging area'
             // (nothing in the current stage of developement)
