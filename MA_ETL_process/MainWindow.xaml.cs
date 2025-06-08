@@ -378,7 +378,7 @@ namespace MA_ETL_process
                     "CALL gds.nodeSimilarity.write(\r\n" +
                     "  'prufSchadentyp',\r\n" +
                     "  {\r\n" +
-                    "    similarityCutoff: 0.25,\r\n" +
+                    "    similarityCutoff: 0.5,\r\n" +
                     "    writeRelationshipType: 'similar',\r\n" +
                     "    writeProperty: 'similarity_schadensmuster'\r\n" +
                     "  }\r\n" +
