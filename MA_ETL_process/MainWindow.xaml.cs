@@ -483,6 +483,64 @@ namespace MA_ETL_process
             buttonsSwitchClickableTo(true);
         }
 
+        private async void btn_ShowResult_Click(object sender, RoutedEventArgs e)
+        {
+            buttonsSwitchClickableTo(false);
+
+            // start new thread beside the UI-thread (which the button would use)
+            Task task = Task.Run(() =>
+            {
+                // identifier and similarity of example:
+                string p1 = "ID_NR5727614_0_2002_H";
+                string p2 = "ID_NR5926682_0_2003_H";
+                string p2_Nachfolger = "ID_NR5926682_0_2020_H";
+                double similarity_schadensmuster = 0.8;
+
+                Utilities.ConsoleLog("\n" +
+                    "Show results for an example query:");
+
+                GetNewDamages(p1, p2, p2_Nachfolger, similarity_schadensmuster);
+            });
+
+            await task;
+            buttonsSwitchClickableTo(true);
+        }
+
+        private void GetNewDamages(string p1, string p2, string p2_Nachfolger, double similarity_schadensmuster)
+        {
+            if (neo4jDriver == null)
+            {
+                Utilities.ConsoleLog("no Neo4j connection");
+                return;
+            }
+
+            Utilities.ConsoleLog("\n" +
+                $"The considered inspection {p1} has a similar damage pattern with inspection {p2},\n" +
+                $"the similarity is {similarity_schadensmuster}.\n" +
+                $"Inspection {p2} has the subsequent inspection {p2_Nachfolger}.\n");
+
+            List<Neo4j.Driver.IRecord> records = neo4jDriver.ExecuteCypherQuery(
+                "CALL{\r\n" +
+                $"    MATCH (p2:PRUFALT {{identifier:'{p2}'}})-[:prufAlt_schadAlt]->(:SCHADALT)-[:istSchadenstyp]->(p2_Schaeden:SCHADENTYP)\r\n" +
+                "    RETURN COLLECT(p2_Schaeden.typId) AS p2_Schaeden\r\n" +
+                "}\r\n" +
+                "CALL(p2_Schaeden){\r\n" +
+                $"    MATCH (:PRUFALT {{identifier:'{p2_Nachfolger}'}})-[:prufAlt_schadAlt]->(schaden:SCHADALT)-[:istSchadenstyp]->(p2_Nachfolger_Schaeden:SCHADENTYP)\r\n" +
+                "        WHERE NOT p2_Nachfolger_Schaeden.typId IN p2_Schaeden\r\n" +
+                "    RETURN p2_Nachfolger_Schaeden, schaden\r\n" +
+                "}\r\n" +
+                "RETURN p2_Nachfolger_Schaeden.typId, p2_Nachfolger_Schaeden.name, schaden.BAUTEIL, schaden.KONTEIL").ToList();
+
+            Utilities.ConsoleLog($"The following damages occured between {p2} and {p2_Nachfolger}:");
+            Utilities.ConsoleLog("  [damage type ID], [damage name], [building component], [construction element]");
+            foreach (Neo4j.Driver.IRecord record in records)
+            {
+                Utilities.ConsoleLog($"  {record["p2_Nachfolger_Schaeden.typId"]}, \"{record["p2_Nachfolger_Schaeden.name"]}\", " +
+                    $"{record["schaden.BAUTEIL"]}, {record["schaden.KONTEIL"]}");
+            }
+            Utilities.ConsoleLog("\n");
+        }
+
         private void btn_Neo4jDeleteNodes_Click(object sender, RoutedEventArgs e)
         {
             if (neo4jDriver == null)

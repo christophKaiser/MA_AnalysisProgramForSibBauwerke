@@ -56,6 +56,12 @@
                     Style="{StaticResource ButtonStyle}" Click="btn_MarkRelationshipsInTBW_Click"/>
             </WrapPanel>
             <Separator Height="10" Background="Transparent"/>
+            <Label Content="Extracting Results from Data Mining" 
+                FontSize="{StaticResource fontSize}" FontWeight="Bold" />
+            <WrapPanel>
+                <Button x:Name="btn_ShowResult" Content="Show Example"
+                    Style="{StaticResource ButtonStyle}" Click="btn_ShowResult_Click"/>
+            </WrapPanel>
         </StackPanel>
 
         <TextBox x:Name="txtConsole" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
